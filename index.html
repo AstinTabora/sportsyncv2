@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SportSync - Instant Court Booking</title>
+    <link rel="preconnect" href="https://www.google.com">
+    <link rel="preconnect" href="https://maps.google.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #ffffff; 
+        color: #111827; 
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      .gray-gradient {
+        background: linear-gradient(135deg, #111827 0%, #374151 100%);
+      }
+      ::selection {
+        background-color: #111827;
+        color: #ffffff;
+      }
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f3f4f6;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #374151;
+        border-radius: 10px;
+      }
+    </style>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="text-primary">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

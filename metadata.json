@@ -1,0 +1,7 @@
+{
+  "name": "Remix: SportSync",
+  "description": "SportSync is a web platform that replaces manual scheduling with instant online booking for badminton, pickleball, and basketball courts.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
