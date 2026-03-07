@@ -216,7 +216,7 @@ const App: React.FC = () => {
     <div className="space-y-20 animate-in fade-in duration-700">
       {/* Hero Section */}
       <section className="relative h-[650px] rounded-[4rem] overflow-hidden flex items-center justify-center text-center p-8 shadow-2xl border-8 border-white">
-        <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-105" style={{backgroundImage: 'url("https://picsum.photos/seed/sportsync/1920/1080")'}}></div>
+        <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-105" style={{backgroundImage: 'url("/images/hero-bg.webp")'}}></div>
         <div className="absolute inset-0 bg-primary-dark/40 backdrop-blur-[2px]"></div>
         <div className="relative z-10 max-w-4xl space-y-10 px-4">
           <div className="space-y-6">
