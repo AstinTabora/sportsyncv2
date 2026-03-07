@@ -341,7 +341,7 @@ const App: React.FC = () => {
                 <i className="fas fa-user-ninja text-3xl"></i>
               </div>
               <div>
-                <h3 className="text-2xl font-black text-primary uppercase">Member 1</h3>
+                <h3 className="text-2xl font-black text-primary uppercase">Astin Tabora</h3>
                 <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mt-1">Frontend & Design Lead</p>
               </div>
            </div>
@@ -350,7 +350,7 @@ const App: React.FC = () => {
                 <i className="fas fa-database text-3xl"></i>
               </div>
               <div>
-                <h3 className="text-2xl font-black text-primary uppercase">Member 2</h3>
+                <h3 className="text-2xl font-black text-primary uppercase">Matthew Jariol</h3>
                 <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mt-1">Backend & Systems Architect</p>
               </div>
            </div>
@@ -1059,7 +1059,7 @@ const App: React.FC = () => {
                </div>
                <div className="space-y-4">
                   <h2 className="text-5xl font-black text-primary tracking-tighter uppercase">John Doe</h2>
-                  <p className="text-slate-400 font-black uppercase text-sm tracking-[0.4em]">Athlete Profile • EST 2024</p>
+                  <p className="text-slate-400 font-black uppercase text-sm tracking-[0.4em]">Athlete Profile • EST 2026</p>
                </div>
                <div className="grid grid-cols-2 gap-8 mt-16">
                   <div className="bg-slate-50 p-12 rounded-[3.5rem] border border-slate-100">
