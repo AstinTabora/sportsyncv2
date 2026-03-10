@@ -1394,12 +1394,9 @@ Phone: ${postEventData.contactPhone || 'N/A'}
                <p className="text-[10px] font-black uppercase text-slate-300 tracking-[0.4em] mb-1">Authenticated</p>
                <p className="text-base font-black text-primary tracking-tight">John Doe</p>
             </div>
-            <button 
-              onClick={() => { setActiveTab('profile'); setSelectedCourt(null); }} 
-              className={`w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-[1.5rem] flex items-center justify-center transition-all duration-500 shadow-sm border-2 ${activeTab === 'profile' ? 'bg-primary text-white border-primary scale-105 shadow-xl' : 'bg-white text-slate-400 border-slate-100 hover:border-primary hover:text-primary'}`}
-            >
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-[1.5rem] flex items-center justify-center shadow-sm border-2 bg-primary text-white border-primary">
               <i className="fas fa-user text-2xl"></i>
-            </button>
+            </div>
           </div>
         </div>
       </header>
@@ -1409,39 +1406,6 @@ Phone: ${postEventData.contactPhone || 'N/A'}
         {activeTab === 'booking' && renderBookingFlow()}
         {activeTab === 'community' && renderCommunity()}
         {activeTab === 'about' && renderAbout()}
-        {activeTab === 'profile' && (
-          <div className="max-w-3xl mx-auto space-y-12 animate-in zoom-in-95 duration-500">
-            <div className="bg-white p-6 md:p-12 lg:p-20 rounded-2xl md:rounded-[5rem] shadow-2xl border border-slate-100 text-center relative overflow-hidden">
-               <div className="absolute top-0 left-0 w-full h-2 bg-primary"></div>
-               <div className="relative inline-block mb-8">
-                  <div className="w-32 h-32 md:w-48 md:h-48 bg-slate-50 rounded-3xl md:rounded-[4rem] mx-auto flex items-center justify-center text-primary text-6xl md:text-8xl rotate-6 shadow-sm border border-slate-200">
-                    <i className="fas fa-user-circle"></i>
-                  </div>
-                  <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-primary text-white rounded-[1.5rem] flex items-center justify-center border-8 border-white shadow-2xl rotate-12">
-                    <i className="fas fa-check text-xl"></i>
-                  </div>
-               </div>
-               <div className="space-y-4">
-                  <h2 className="text-3xl md:text-5xl font-black text-primary tracking-tighter uppercase">John Doe</h2>
-                  <p className="text-slate-400 font-black uppercase text-sm tracking-[0.4em]">Athlete Profile • EST 2024</p>
-               </div>
-               <div className="grid grid-cols-2 gap-4 md:gap-8 mt-10 md:mt-16">
-                  <div className="bg-slate-50 p-6 md:p-12 rounded-2xl md:rounded-[3.5rem] border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3">Sessions</p>
-                    <p className="text-4xl md:text-6xl font-black text-primary tracking-tighter">14</p>
-                  </div>
-                  <div className="bg-primary p-6 md:p-12 rounded-2xl md:rounded-[3.5rem] border border-slate-900 shadow-2xl shadow-slate-900/10">
-                    <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-3">Activity Score</p>
-                    <p className="text-4xl md:text-6xl font-black text-white tracking-tighter">950</p>
-                  </div>
-               </div>
-               <div className="flex flex-col sm:flex-row gap-4 pt-12">
-                  <button className="flex-1 bg-primary text-white py-6 rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl text-lg uppercase tracking-widest active:scale-95">Edit Account</button>
-                  <button className="flex-1 bg-slate-50 text-primary py-6 rounded-[2rem] font-black hover:bg-slate-100 transition border border-slate-200 text-lg uppercase tracking-widest active:scale-95">Settings</button>
-               </div>
-            </div>
-          </div>
-        )}
       </main>
 
       <footer className="bg-slate-50 text-primary pt-16 md:pt-32 pb-16 px-4 md:px-8 rounded-t-3xl md:rounded-t-[6rem] mt-20 md:mt-40 border-t border-slate-100">
@@ -1491,7 +1455,6 @@ Phone: ${postEventData.contactPhone || 'N/A'}
           { tab: 'home', icon: 'fa-home', label: 'Home' },
           { tab: 'community', icon: 'fa-users', label: 'Community' },
           { tab: 'about', icon: 'fa-info-circle', label: 'About' },
-          { tab: 'profile', icon: 'fa-user', label: 'Profile' },
         ].map(item => (
           <button
             key={item.tab}
