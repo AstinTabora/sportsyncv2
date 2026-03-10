@@ -263,7 +263,7 @@ const App: React.FC = () => {
         <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"></div>
         <div className="relative z-10 max-w-4xl space-y-10 px-4">
           <div className="space-y-6">
-            <h1 className="text-5xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase">Find your <br/>Arena.</h1>
+            <h1 className="text-5xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase">Plan Less <br/>Play More.</h1>
             <p className="text-white/90 text-base md:text-xl font-medium max-w-xl mx-auto leading-relaxed tracking-wide">Book premium Badminton, Pickleball, and Basketball courts in a few clicks.</p>
           </div>
           <div className="flex bg-white/10 backdrop-blur-md rounded-full p-1.5 md:p-3 shadow-2xl max-w-md md:max-w-xl mx-auto group focus-within:ring-4 focus-within:ring-white/20 transition-all border border-white/20">
@@ -285,7 +285,7 @@ const App: React.FC = () => {
       </section>
 
       {/* How It Works - overlapping hero */}
-      <section className="relative z-10 -mt-[10rem] md:-mt-[14rem] bg-white rounded-2xl md:rounded-[3rem] shadow-2xl shadow-slate-200/60 py-8 px-6 md:py-16 md:px-12 lg:py-16 lg:px-16 overflow-hidden border border-slate-100">
+      <section className="relative z-10 -mt-[10rem] md:-mt-[14rem] bg-white rounded-2xl md:rounded-[3rem] shadow-[0_0_60px_20px_rgba(255,255,255,0.35)] md:shadow-[0_0_100px_40px_rgba(255,255,255,0.45)] py-8 px-6 md:py-16 md:px-12 lg:py-16 lg:px-16 overflow-hidden">
 
         {/* Desktop: horizontal timeline with curved line */}
         <div className="hidden md:block relative">
@@ -1629,7 +1629,6 @@ Phone: ${postEventData.contactPhone || 'N/A'}
               </nav>
               <div className="flex items-center gap-3 md:gap-6">
                 <div className="hidden sm:block text-right">
-                   <p className="text-[9px] md:text-[10px] font-black uppercase text-slate-300 tracking-[0.4em] mb-0.5">Authenticated</p>
                    <p className="text-sm md:text-base font-black text-primary tracking-tight">John Doe</p>
                 </div>
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-[1rem] flex items-center justify-center shadow-sm border-2 bg-primary text-white border-primary">
