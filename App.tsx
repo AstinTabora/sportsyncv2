@@ -228,13 +228,13 @@ const App: React.FC = () => {
   const renderHome = () => (
     <div className="space-y-20 animate-in fade-in duration-700">
       {/* Hero Section */}
-      <section className="relative h-[650px] rounded-[4rem] overflow-hidden flex items-center justify-center text-center p-8 shadow-2xl border-8 border-white">
+      <section className="relative h-[400px] md:h-[650px] rounded-3xl md:rounded-[4rem] overflow-hidden flex items-center justify-center text-center p-4 md:p-8 shadow-2xl border-4 md:border-8 border-white">
         <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-105" style={{backgroundImage: 'url("/images/hero-bg.webp")'}}></div>
         <div className="absolute inset-0 bg-primary-dark/40 backdrop-blur-[2px]"></div>
         <div className="relative z-10 max-w-4xl space-y-10 px-4">
           <div className="space-y-6">
-            <h1 className="text-7xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase">Find your <br/>Arena.</h1>
-            <p className="text-white/90 text-xl font-medium max-w-xl mx-auto leading-relaxed tracking-wide">Book premium Badminton, Pickleball, and Basketball courts in a few clicks.</p>
+            <h1 className="text-5xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase">Find your <br/>Arena.</h1>
+            <p className="text-white/90 text-base md:text-xl font-medium max-w-xl mx-auto leading-relaxed tracking-wide">Book premium Badminton, Pickleball, and Basketball courts in a few clicks.</p>
           </div>
           <div className="flex bg-white/10 backdrop-blur-md rounded-[2.5rem] p-3 shadow-2xl max-w-xl mx-auto group focus-within:ring-4 focus-within:ring-white/20 transition-all border border-white/20">
             <input 
@@ -246,7 +246,7 @@ const App: React.FC = () => {
             />
             <button 
               onClick={scrollToBrowse}
-              className="bg-white text-primary px-12 py-5 rounded-[2rem] font-black hover:bg-primary-extralight transition active:scale-95 shadow-xl text-sm uppercase tracking-[0.2em]"
+              className="bg-white text-primary px-6 md:px-12 py-4 md:py-5 rounded-[2rem] font-black hover:bg-primary-extralight transition active:scale-95 shadow-xl text-xs md:text-sm uppercase tracking-[0.2em]"
             >
               Search
             </button>
@@ -255,20 +255,20 @@ const App: React.FC = () => {
       </section>
 
       {/* Categories */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <section className="grid grid-cols-3 gap-3 md:gap-8">
         {['Badminton', 'Pickleball', 'Basketball'].map(sport => (
-          <button 
+          <button
             key={sport}
             onClick={() => { setFilter(sport as SportType); scrollToBrowse(); }}
-            className="group relative h-56 rounded-[3rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 bg-white p-8"
+            className="group relative h-32 md:h-56 rounded-2xl md:rounded-[3rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 bg-white p-3 md:p-8"
           >
             <div className="flex flex-col items-center justify-center h-full space-y-4">
-              <div className="w-20 h-20 rounded-[2rem] flex items-center justify-center bg-slate-50 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-sm border border-slate-100">
-                <i className={`fas ${sport === 'Badminton' ? 'fa-table-tennis-paddle-ball' : sport === 'Pickleball' ? 'fa-circle-dot' : 'fa-basketball'} text-4xl`}></i>
+              <div className="w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-[2rem] flex items-center justify-center bg-slate-50 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-sm border border-slate-100">
+                <i className={`fas ${sport === 'Badminton' ? 'fa-table-tennis-paddle-ball' : sport === 'Pickleball' ? 'fa-circle-dot' : 'fa-basketball'} text-xl md:text-4xl`}></i>
               </div>
               <div className="text-center">
-                <span className="block font-black text-3xl text-primary tracking-tight">{sport}</span>
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Instant Booking</span>
+                <span className="block font-black text-sm md:text-3xl text-primary tracking-tight">{sport}</span>
+                <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1 hidden md:block">Instant Booking</span>
               </div>
             </div>
           </button>
@@ -277,17 +277,17 @@ const App: React.FC = () => {
 
       {/* Courts Listing */}
       <section ref={browseRef} className="space-y-12 scroll-mt-28 pb-16">
-        <div className="flex flex-col lg:flex-row justify-between items-center gap-8 bg-primary-extralight p-12 rounded-[4rem] shadow-sm border border-primary/5">
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-6 md:gap-8 bg-primary-extralight p-6 md:p-12 rounded-2xl md:rounded-[4rem] shadow-sm border border-primary/5">
           <div className="text-center lg:text-left">
-             <h2 className="text-5xl font-black text-primary tracking-tighter uppercase">Explore Facilities.</h2>
-             <p className="text-primary/60 font-bold text-lg">Premium courts for every skill level.</p>
+             <h2 className="text-3xl md:text-5xl font-black text-primary tracking-tighter uppercase">Explore Facilities.</h2>
+             <p className="text-primary/60 font-bold text-sm md:text-lg">Premium courts for every skill level.</p>
           </div>
-          <div className="flex flex-wrap justify-center gap-2 bg-white p-2 rounded-[2.5rem] border border-primary/10 shadow-xl shadow-primary/5">
+          <div className="flex flex-wrap justify-center gap-1 md:gap-2 bg-white p-1.5 md:p-2 rounded-2xl md:rounded-[2.5rem] border border-primary/10 shadow-xl shadow-primary/5">
             {['All', 'Badminton', 'Pickleball', 'Basketball'].map(s => (
-              <button 
+              <button
                 key={s}
                 onClick={() => setFilter(s as any)}
-                className={`px-10 py-5 rounded-[2rem] text-sm font-black transition-all duration-500 ${filter === s ? 'bg-primary text-white shadow-2xl scale-105' : 'text-slate-400 hover:text-primary'}`}
+                className={`px-4 md:px-10 py-3 md:py-5 rounded-xl md:rounded-[2rem] text-xs md:text-sm font-black transition-all duration-500 ${filter === s ? 'bg-primary text-white shadow-2xl scale-105' : 'text-slate-400 hover:text-primary'}`}
               >
                 {s}
               </button>
@@ -305,15 +305,15 @@ const App: React.FC = () => {
   );
 
   const renderAbout = () => (
-    <div className="space-y-32 animate-in fade-in duration-1000 pb-20">
+    <div className="space-y-16 md:space-y-32 animate-in fade-in duration-1000 pb-20">
       {/* Slide 1: Title Slide */}
-      <section className="text-center py-24 space-y-10">
+      <section className="text-center py-12 md:py-24 space-y-8 md:space-y-10">
         <div className="w-24 h-24 bg-primary text-white rounded-3xl flex items-center justify-center mx-auto shadow-2xl mb-8">
           <i className="fas fa-bolt text-4xl"></i>
         </div>
         <div className="space-y-4">
-          <h1 className="text-8xl font-black text-primary tracking-tighter uppercase">SportSync</h1>
-          <p className="text-slate-400 text-3xl font-black uppercase tracking-[0.2em]">Seamless Booking for Active Lifestyles</p>
+          <h1 className="text-5xl md:text-8xl font-black text-primary tracking-tighter uppercase">SportSync</h1>
+          <p className="text-slate-400 text-lg md:text-3xl font-black uppercase tracking-[0.1em] md:tracking-[0.2em]">Seamless Booking for Active Lifestyles</p>
         </div>
         <div className="flex justify-center gap-12 pt-10 text-slate-300 font-black text-xs uppercase tracking-[0.4em]">
            <span>Team Venture</span>
@@ -324,20 +324,20 @@ const App: React.FC = () => {
 
       {/* Slide 2: The Problem & Solution */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div className="bg-slate-50 p-16 rounded-[4rem] border border-slate-100 space-y-8">
+        <div className="bg-slate-50 p-8 md:p-16 rounded-2xl md:rounded-[4rem] border border-slate-100 space-y-6 md:space-y-8">
           <div className="flex flex-col gap-2">
             <span className="bg-primary text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest self-start">The Problem</span>
-            <h2 className="text-5xl font-black text-primary uppercase tracking-tighter">Friction in Play</h2>
+            <h2 className="text-3xl md:text-5xl font-black text-primary uppercase tracking-tighter">Friction in Play</h2>
           </div>
           <p className="text-slate-500 text-xl font-medium leading-relaxed">
             Booking local courts (Badminton, Pickleball, Basketball) is tedious. Relies on outdated Facebook searches, endless manual calls, and insecure bank transfers.
           </p>
           <div className="w-12 h-1 bg-primary/20 rounded-full"></div>
         </div>
-        <div className="bg-white p-16 rounded-[4rem] border-4 border-primary space-y-8 shadow-2xl">
+        <div className="bg-white p-8 md:p-16 rounded-2xl md:rounded-[4rem] border-4 border-primary space-y-6 md:space-y-8 shadow-2xl">
           <div className="flex flex-col gap-2">
             <span className="bg-primary text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest self-start">The Solution</span>
-            <h2 className="text-5xl font-black text-primary uppercase tracking-tighter">Centralized Flow</h2>
+            <h2 className="text-3xl md:text-5xl font-black text-primary uppercase tracking-tighter">Centralized Flow</h2>
           </div>
           <p className="text-slate-500 text-xl font-medium leading-relaxed">
             A centralized web platform for instant, real-time booking. Connecting athletes with facility owners seamlessly without the administrative headache.
@@ -375,12 +375,12 @@ const App: React.FC = () => {
       </section>
 
       {/* Slide 4: AI Integration & SDG */}
-      <section className="bg-primary p-20 rounded-[5rem] text-white relative overflow-hidden border border-primary-dark shadow-2xl">
+      <section className="bg-primary p-8 md:p-20 rounded-2xl md:rounded-[5rem] text-white relative overflow-hidden border border-primary-dark shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-[120px]"></div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <div className="space-y-10">
             <div className="space-y-4">
-              <h2 className="text-6xl font-black uppercase tracking-tighter leading-none">AI Powered<br/>Design.</h2>
+              <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">AI Powered<br/>Design.</h2>
               <p className="text-white/80 text-xl font-medium">Utilizing Gemini AI to refine code, improve workflow efficiency, and ensure clean final output.</p>
             </div>
             <div className="flex gap-12 pt-4">
@@ -400,11 +400,11 @@ const App: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white/10 backdrop-blur-3xl p-16 rounded-[4rem] border border-white/20 space-y-8">
+          <div className="bg-white/10 backdrop-blur-3xl p-8 md:p-16 rounded-2xl md:rounded-[4rem] border border-white/20 space-y-6 md:space-y-8">
             <div className="w-20 h-20 bg-white text-primary rounded-[2rem] flex items-center justify-center shadow-2xl">
               <i className="fas fa-heartbeat text-3xl"></i>
             </div>
-            <h3 className="text-4xl font-black uppercase tracking-tighter">SDG Goal #3</h3>
+            <h3 className="text-2xl md:text-4xl font-black uppercase tracking-tighter">SDG Goal #3</h3>
             <p className="text-white/80 text-lg font-medium">Good Health and Well-being. Encouraging physical activity by removing booking friction across local communities.</p>
           </div>
         </div>
@@ -445,16 +445,16 @@ const App: React.FC = () => {
       </section>
 
       {/* Slide 6: Key Features */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-8">
         {[
           { label: 'Calendar', icon: 'fa-calendar-check', desc: 'Real-time sync' },
           { label: 'Maps', icon: 'fa-location-arrow', desc: 'Geo-integration' },
           { label: 'Payments', icon: 'fa-shield-halved', desc: 'Secure checkout' },
           { label: 'Community', icon: 'fa-trophy', desc: 'Tournament brackets' }
         ].map(f => (
-          <div key={f.label} className="text-center space-y-6 p-8 bg-white border border-slate-100 rounded-[3rem] shadow-sm hover:shadow-xl transition-all group">
-             <div className="w-20 h-20 bg-slate-50 rounded-[1.5rem] mx-auto flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-inner">
-               <i className={`fas ${f.icon} text-3xl`}></i>
+          <div key={f.label} className="text-center space-y-4 md:space-y-6 p-4 md:p-8 bg-white border border-slate-100 rounded-2xl md:rounded-[3rem] shadow-sm hover:shadow-xl transition-all group">
+             <div className="w-14 h-14 md:w-20 md:h-20 bg-slate-50 rounded-xl md:rounded-[1.5rem] mx-auto flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-inner">
+               <i className={`fas ${f.icon} text-xl md:text-3xl`}></i>
              </div>
              <div className="space-y-2">
                <h5 className="font-black text-lg uppercase text-primary">{f.label}</h5>
@@ -465,13 +465,13 @@ const App: React.FC = () => {
       </section>
 
       {/* Slide 7: Roadmap & Goals */}
-      <section className="bg-slate-50 p-20 rounded-[5rem] border border-slate-100 space-y-16">
+      <section className="bg-slate-50 p-6 md:p-20 rounded-2xl md:rounded-[5rem] border border-slate-100 space-y-10 md:space-y-16">
         <div className="flex flex-col lg:flex-row justify-between items-center gap-12">
           <div className="space-y-4">
-             <h2 className="text-6xl font-black text-primary uppercase tracking-tighter leading-none">Strategic<br/>Growth.</h2>
+             <h2 className="text-4xl md:text-6xl font-black text-primary uppercase tracking-tighter leading-none">Strategic<br/>Growth.</h2>
              <p className="text-slate-400 font-bold text-xl uppercase tracking-widest">Target: Digitize 50% of local courts.</p>
           </div>
-          <div className="bg-white p-12 rounded-[4rem] border border-slate-200 shadow-sm flex-1 max-w-xl">
+          <div className="bg-white p-8 md:p-12 rounded-2xl md:rounded-[4rem] border border-slate-200 shadow-sm flex-1 max-w-xl">
              <h4 className="text-primary font-black uppercase text-xs tracking-[0.4em] mb-10">Release Criteria</h4>
              <ul className="space-y-6 font-black text-primary uppercase text-sm tracking-tighter">
                 <li className="flex items-center gap-4"><i className="fas fa-circle-check text-emerald-500"></i> Seamless Search-to-Booking Flow</li>
@@ -494,8 +494,8 @@ const App: React.FC = () => {
             <i className="fas fa-arrow-left mr-3 group-hover:-translate-x-2 transition-transform"></i> Back to Listing
           </button>
 
-          <div className="bg-white rounded-[4rem] shadow-2xl overflow-hidden border border-slate-100">
-            <div className="p-10 md:p-16 space-y-10">
+          <div className="bg-white rounded-2xl md:rounded-[4rem] shadow-2xl overflow-hidden border border-slate-100">
+            <div className="p-6 md:p-16 space-y-8 md:space-y-10">
               <div className="flex flex-col md:flex-row justify-between items-start gap-8">
                 <div className="space-y-4">
                   <div className="flex gap-3">
@@ -504,12 +504,12 @@ const App: React.FC = () => {
                       <i className="fas fa-star mr-2"></i> {selectedCourt.rating}
                     </div>
                   </div>
-                  <h2 className="text-5xl font-black text-primary leading-tight tracking-tighter uppercase">{selectedCourt.name}</h2>
+                  <h2 className="text-3xl md:text-5xl font-black text-primary leading-tight tracking-tighter uppercase">{selectedCourt.name}</h2>
                   <p className="text-slate-500 flex items-center font-bold text-lg"><i className="fas fa-map-pin mr-3 text-primary"></i>{selectedCourt.location}</p>
                 </div>
                 <div className="text-center md:text-right space-y-4">
                   <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">Starting from</p>
-                  <p className="text-6xl font-black text-primary tracking-tighter">₱{selectedCourt.price}<span className="text-xl text-slate-300 font-bold ml-2 tracking-normal">/hr</span></p>
+                  <p className="text-4xl md:text-6xl font-black text-primary tracking-tighter">₱{selectedCourt.price}<span className="text-lg md:text-xl text-slate-300 font-bold ml-2 tracking-normal">/hr</span></p>
                   <button 
                     onClick={() => setBookingStep('calendar')}
                     className="w-full bg-primary text-white px-12 py-6 rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl text-lg uppercase tracking-widest active:scale-95 mt-4"
@@ -751,7 +751,7 @@ const App: React.FC = () => {
           </div>
 
           {/* Floating Action Bar */}
-          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-slate-100 p-6 flex items-center gap-12 z-50 animate-in slide-in-from-bottom-8">
+          <div className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-slate-100 p-4 md:p-6 flex items-center gap-6 md:gap-12 z-50 animate-in slide-in-from-bottom-8 w-[calc(100%-2rem)] md:w-auto max-w-lg md:max-w-none">
             <button onClick={() => setBookingStep('details')} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
               <i className="fas fa-times"></i>
             </button>
@@ -782,7 +782,7 @@ const App: React.FC = () => {
       
       return (
         <div className="max-w-4xl mx-auto animate-in slide-in-from-right-12 duration-500 pb-20">
-          <div className="bg-white rounded-[4rem] shadow-2xl p-12 lg:p-20 border border-slate-100 space-y-12">
+          <div className="bg-white rounded-2xl md:rounded-[4rem] shadow-2xl p-6 md:p-12 lg:p-20 border border-slate-100 space-y-10 md:space-y-12">
           <div className="text-center space-y-4">
             <div className="w-20 h-20 bg-primary text-white rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-primary/20">
               <i className="fas fa-credit-card text-3xl"></i>
@@ -983,7 +983,7 @@ const App: React.FC = () => {
 
       return (
         <div className="max-w-4xl mx-auto animate-in slide-in-from-bottom-12 duration-700 pb-20">
-           <div className="bg-white rounded-[4rem] shadow-2xl p-12 lg:p-20 border border-slate-100 space-y-12">
+           <div className="bg-white rounded-2xl md:rounded-[4rem] shadow-2xl p-6 md:p-12 lg:p-20 border border-slate-100 space-y-10 md:space-y-12">
               <div className="flex justify-between items-start border-b border-slate-100 pb-10">
                 <Logo />
                 <div className="text-right">
@@ -1261,8 +1261,8 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-40 glass border-b border-slate-100 h-28 flex items-center">
-        <div className="max-w-7xl mx-auto px-8 w-full flex items-center justify-between">
+      <header className="sticky top-0 z-40 glass border-b border-slate-100 h-20 md:h-28 flex items-center">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 w-full flex items-center justify-between">
           <div onClick={() => { setActiveTab('home'); setSelectedCourt(null); setBookingStep('details'); window.scrollTo({top: 0, behavior: 'smooth'}); }}>
             <Logo />
           </div>
@@ -1280,14 +1280,14 @@ const App: React.FC = () => {
               </button>
             ))}
           </nav>
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4 md:gap-8">
             <div className="hidden sm:block text-right">
                <p className="text-[10px] font-black uppercase text-slate-300 tracking-[0.4em] mb-1">Authenticated</p>
                <p className="text-base font-black text-primary tracking-tight">John Doe</p>
             </div>
             <button 
               onClick={() => { setActiveTab('profile'); setSelectedCourt(null); }} 
-              className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center transition-all duration-500 shadow-sm border-2 ${activeTab === 'profile' ? 'bg-primary text-white border-primary scale-105 shadow-xl' : 'bg-white text-slate-400 border-slate-100 hover:border-primary hover:text-primary'}`}
+              className={`w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-[1.5rem] flex items-center justify-center transition-all duration-500 shadow-sm border-2 ${activeTab === 'profile' ? 'bg-primary text-white border-primary scale-105 shadow-xl' : 'bg-white text-slate-400 border-slate-100 hover:border-primary hover:text-primary'}`}
             >
               <i className="fas fa-user text-2xl"></i>
             </button>
@@ -1295,17 +1295,17 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-8 py-16">
+      <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-16 pb-20 md:pb-16">
         {activeTab === 'home' && renderHome()}
         {activeTab === 'booking' && renderBookingFlow()}
         {activeTab === 'community' && renderCommunity()}
         {activeTab === 'about' && renderAbout()}
         {activeTab === 'profile' && (
           <div className="max-w-3xl mx-auto space-y-12 animate-in zoom-in-95 duration-500">
-            <div className="bg-white p-12 lg:p-20 rounded-[5rem] shadow-2xl border border-slate-100 text-center relative overflow-hidden">
+            <div className="bg-white p-6 md:p-12 lg:p-20 rounded-2xl md:rounded-[5rem] shadow-2xl border border-slate-100 text-center relative overflow-hidden">
                <div className="absolute top-0 left-0 w-full h-2 bg-primary"></div>
                <div className="relative inline-block mb-8">
-                  <div className="w-48 h-48 bg-slate-50 rounded-[4rem] mx-auto flex items-center justify-center text-primary text-8xl rotate-6 shadow-sm border border-slate-200">
+                  <div className="w-32 h-32 md:w-48 md:h-48 bg-slate-50 rounded-3xl md:rounded-[4rem] mx-auto flex items-center justify-center text-primary text-6xl md:text-8xl rotate-6 shadow-sm border border-slate-200">
                     <i className="fas fa-user-circle"></i>
                   </div>
                   <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-primary text-white rounded-[1.5rem] flex items-center justify-center border-8 border-white shadow-2xl rotate-12">
@@ -1313,17 +1313,17 @@ const App: React.FC = () => {
                   </div>
                </div>
                <div className="space-y-4">
-                  <h2 className="text-5xl font-black text-primary tracking-tighter uppercase">John Doe</h2>
+                  <h2 className="text-3xl md:text-5xl font-black text-primary tracking-tighter uppercase">John Doe</h2>
                   <p className="text-slate-400 font-black uppercase text-sm tracking-[0.4em]">Athlete Profile • EST 2024</p>
                </div>
-               <div className="grid grid-cols-2 gap-8 mt-16">
-                  <div className="bg-slate-50 p-12 rounded-[3.5rem] border border-slate-100">
+               <div className="grid grid-cols-2 gap-4 md:gap-8 mt-10 md:mt-16">
+                  <div className="bg-slate-50 p-6 md:p-12 rounded-2xl md:rounded-[3.5rem] border border-slate-100">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3">Sessions</p>
-                    <p className="text-6xl font-black text-primary tracking-tighter">14</p>
+                    <p className="text-4xl md:text-6xl font-black text-primary tracking-tighter">14</p>
                   </div>
-                  <div className="bg-primary p-12 rounded-[3.5rem] border border-slate-900 shadow-2xl shadow-slate-900/10">
+                  <div className="bg-primary p-6 md:p-12 rounded-2xl md:rounded-[3.5rem] border border-slate-900 shadow-2xl shadow-slate-900/10">
                     <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-3">Activity Score</p>
-                    <p className="text-6xl font-black text-white tracking-tighter">950</p>
+                    <p className="text-4xl md:text-6xl font-black text-white tracking-tighter">950</p>
                   </div>
                </div>
                <div className="flex flex-col sm:flex-row gap-4 pt-12">
@@ -1335,7 +1335,7 @@ const App: React.FC = () => {
         )}
       </main>
 
-      <footer className="bg-slate-50 text-primary pt-32 pb-16 px-8 rounded-t-[6rem] mt-40 border-t border-slate-100">
+      <footer className="bg-slate-50 text-primary pt-16 md:pt-32 pb-16 px-4 md:px-8 rounded-t-3xl md:rounded-t-[6rem] mt-20 md:mt-40 border-t border-slate-100">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-20">
            <div className="md:col-span-5 space-y-10">
              <div className="flex items-center gap-3 font-extrabold text-4xl tracking-tighter cursor-pointer">
@@ -1381,13 +1381,32 @@ const App: React.FC = () => {
       </footer>
 
       <SportBot />
+
+      {/* Mobile Bottom Nav */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 flex md:hidden justify-around py-2 px-2">
+        {[
+          { tab: 'home', icon: 'fa-home', label: 'Home' },
+          { tab: 'community', icon: 'fa-users', label: 'Community' },
+          { tab: 'about', icon: 'fa-info-circle', label: 'About' },
+          { tab: 'profile', icon: 'fa-user', label: 'Profile' },
+        ].map(item => (
+          <button
+            key={item.tab}
+            onClick={() => { setActiveTab(item.tab); setSelectedCourt(null); setBookingStep('details'); window.scrollTo({top: 0, behavior: 'smooth'}); }}
+            className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${activeTab === item.tab ? 'text-primary' : 'text-slate-400'}`}
+          >
+            <i className={`fas ${item.icon} text-lg`}></i>
+            <span className="text-[9px] font-black uppercase tracking-wider">{item.label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 };
 
 const CourtCard: React.FC<{court: Court, onBook: () => void}> = ({ court, onBook }) => {
   return (
-    <div className="bg-white rounded-[3rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 group border border-slate-100 flex flex-col h-full active:scale-[0.98]">
+    <div className="bg-white rounded-2xl md:rounded-[3rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 group border border-slate-100 flex flex-col h-full active:scale-[0.98]">
       <div className="relative h-64 overflow-hidden shrink-0">
         <img src={court.image} alt={court.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 grayscale-[40%] group-hover:grayscale-0" />
         <div className="absolute inset-0 bg-primary-dark/10 group-hover:bg-transparent transition-colors"></div>
