@@ -15,6 +15,7 @@ export interface Court {
   description: string;
   phone?: string;
   email?: string;
+  numberOfCourts?: number;
 }
 
 export interface BookingDetails {

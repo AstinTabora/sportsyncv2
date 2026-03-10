@@ -15,7 +15,8 @@ export const COURTS: Court[] = [
     amenities: ['Locker Rooms', 'Pro Shop', 'Cafe'],
     description: 'Premier indoor badminton facility with professional-grade flooring and lighting.',
     phone: '+63 82 221 1234',
-    email: 'contact@smashville.ph'
+    email: 'contact@smashville.ph',
+    numberOfCourts: 12
   },
   {
     id: 'c2',
@@ -30,7 +31,8 @@ export const COURTS: Court[] = [
     amenities: ['Equipment Rental', 'Water Station'],
     description: 'Modern pickleball courts with a vibrant community atmosphere.',
     phone: '+63 82 297 5678',
-    email: 'play@thepickleloft.ph'
+    email: 'play@thepickleloft.ph',
+    numberOfCourts: 6
   },
   {
     id: 'c3',
@@ -45,7 +47,8 @@ export const COURTS: Court[] = [
     amenities: ['Showers', 'Bleachers', 'Scoreboard'],
     description: 'Full-sized hardwood basketball court perfect for team practice and pickup games.',
     phone: '+63 82 225 9012',
-    email: 'info@evergold.ph'
+    email: 'info@evergold.ph',
+    numberOfCourts: 2
   },
   {
     id: 'c4',
@@ -60,7 +63,8 @@ export const COURTS: Court[] = [
     amenities: ['Coach available', 'Parking'],
     description: 'Elite training center specializing in badminton player development.',
     phone: '+63 82 224 3456',
-    email: 'hello@badmintonworld.ph'
+    email: 'hello@badmintonworld.ph',
+    numberOfCourts: 10
   },
   {
     id: 'c5',
@@ -75,7 +79,8 @@ export const COURTS: Court[] = [
     amenities: ['Benches', 'Night Lighting'],
     description: 'Affordable outdoor courts with excellent night lighting and a friendly neighborhood vibe.',
     phone: '+63 82 298 7890',
-    email: 'support@crisron.ph'
+    email: 'support@crisron.ph',
+    numberOfCourts: 8
   }
 ];
 
@@ -86,7 +91,7 @@ export const COMMUNITY_EVENTS: CommunityEvent[] = [
     date: 'JUN 15, 2026',
     courtId: 'c1',
     locationName: 'Smash Ville Fitness Center',
-    address: '31 T.Monteverde St, Poblacion District, Davao City',
+    address: '31 T.Monteverde St, Poblacion District, Davao City, 8000 Davao del Sur',
     description: 'Join the biggest local badminton tournament in Davao City. Open to all skill levels with pro categorization. Cash prizes for winners!',
     registrationFee: '₱500',
     participants: 45,
@@ -97,8 +102,8 @@ export const COMMUNITY_EVENTS: CommunityEvent[] = [
     title: 'Open Masters',
     date: 'JUN 22, 2026',
     courtId: 'c2',
-    locationName: 'The Pickle Loft',
-    address: 'University of Mindanao Dr, Talomo, Davao City',
+    locationName: 'MTS Pickleball Courts',
+    address: 'Matina Town Square, Talomo, Davao City, Davao del Sur',
     description: 'Compete in the Open Masters pickleball event. A great way to meet the local community and test your skills.',
     registrationFee: '₱450',
     participants: 32,
@@ -110,7 +115,7 @@ export const COMMUNITY_EVENTS: CommunityEvent[] = [
     date: 'JUL 05, 2026',
     courtId: 'c3',
     locationName: 'Evergold Recreation Center',
-    address: 'Iñigo St, Obrero, Davao City',
+    address: 'Iñigo St, Obrero, Davao City, Davao del Sur',
     description: 'Gather your squad for an intense 3v3 basketball showdown. Full-court action with certified referees.',
     registrationFee: '₱1200/team',
     participants: 24,
@@ -122,7 +127,7 @@ export const COMMUNITY_EVENTS: CommunityEvent[] = [
     date: 'JUL 18, 2026',
     courtId: 'c4',
     locationName: 'Badminton World',
-    address: 'Avanceña St, Poblacion District, Davao City',
+    address: 'Avanceña St, Poblacion District, Davao City, 8000 Davao del Sur',
     description: 'The annual Legacy Cup is back! Experience elite competition at Badminton World. Register early to secure your spot.',
     registrationFee: '₱600',
     participants: 60,

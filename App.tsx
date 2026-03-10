@@ -126,6 +126,8 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CommunityEvent | null>(null);
+  const [eventRegistrationStep, setEventRegistrationStep] = useState<'details' | 'form' | 'success'>('details');
+  const [selectedSlots, setSelectedSlots] = useState<{court: string, time: string}[]>([]);
   const [bookingStep, setBookingStep] = useState<'details' | 'calendar' | 'payment' | 'success' | 'confirmation'>('details');
   const [detailSubTab, setDetailSubTab] = useState<'map' | 'photos' | 'pricing' | 'availability'>('photos');
   
@@ -135,6 +137,16 @@ const App: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [bookedSlots, setBookedSlots] = useState<{facilityId: string, date: string, court: string, time: string}[]>([
+    { facilityId: 'c1', date: format(new Date(), 'yyyy-MM-dd'), court: 'Court 1', time: '9:00 AM - 10:00 AM' },
+    { facilityId: 'c1', date: format(new Date(), 'yyyy-MM-dd'), court: 'Court 2', time: '10:00 AM - 11:00 AM' },
+    { facilityId: 'c2', date: format(new Date(), 'yyyy-MM-dd'), court: 'Court 3', time: '2:00 PM - 3:00 PM' },
+  ]);
+  const [showUserFormModal, setShowUserFormModal] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPhone, setUserPhone] = useState('');
 
   const browseRef = useRef<HTMLDivElement>(null);
 
@@ -207,6 +219,7 @@ const App: React.FC = () => {
 
   const handleCourtSelect = (court: Court) => {
     setSelectedCourt(court);
+    setSelectedSlots([]);
     setActiveTab('booking');
     setBookingStep('details');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -312,16 +325,20 @@ const App: React.FC = () => {
       {/* Slide 2: The Problem & Solution */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div className="bg-slate-50 p-16 rounded-[4rem] border border-slate-100 space-y-8">
-          <span className="bg-primary text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">The Problem</span>
-          <h2 className="text-5xl font-black text-primary uppercase tracking-tighter">Friction in Play</h2>
+          <div className="flex flex-col gap-2">
+            <span className="bg-primary text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest self-start">The Problem</span>
+            <h2 className="text-5xl font-black text-primary uppercase tracking-tighter">Friction in Play</h2>
+          </div>
           <p className="text-slate-500 text-xl font-medium leading-relaxed">
             Booking local courts (Badminton, Pickleball, Basketball) is tedious. Relies on outdated Facebook searches, endless manual calls, and insecure bank transfers.
           </p>
           <div className="w-12 h-1 bg-primary/20 rounded-full"></div>
         </div>
         <div className="bg-white p-16 rounded-[4rem] border-4 border-primary space-y-8 shadow-2xl">
-          <span className="bg-primary text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">The Solution</span>
-          <h2 className="text-5xl font-black text-primary uppercase tracking-tighter">Centralized Flow</h2>
+          <div className="flex flex-col gap-2">
+            <span className="bg-primary text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest self-start">The Solution</span>
+            <h2 className="text-5xl font-black text-primary uppercase tracking-tighter">Centralized Flow</h2>
+          </div>
           <p className="text-slate-500 text-xl font-medium leading-relaxed">
             A centralized web platform for instant, real-time booking. Connecting athletes with facility owners seamlessly without the administrative headache.
           </p>
@@ -508,8 +525,7 @@ const App: React.FC = () => {
                   {[
                     { id: 'photos', label: 'Gallery', icon: 'fa-images' },
                     { id: 'map', label: 'Location', icon: 'fa-map-marked-alt' },
-                    { id: 'pricing', label: 'Pricing Info', icon: 'fa-tag' },
-                    { id: 'availability', label: 'Hours', icon: 'fa-clock' }
+                    { id: 'pricing', label: 'Pricing Info', icon: 'fa-tag' }
                   ].map(tab => (
                     <button
                       key={tab.id}
@@ -556,23 +572,6 @@ const App: React.FC = () => {
                        </div>
                     </div>
                   )}
-                  {detailSubTab === 'availability' && (
-                    <div className="space-y-6">
-                       <div className="grid grid-cols-7 gap-2">
-                         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-                           <div key={day} className="text-center font-black text-[10px] uppercase text-slate-400 py-4">{day}</div>
-                         ))}
-                         {Array.from({length: 31}).map((_, i) => (
-                           <div key={i} className={`h-24 rounded-2xl border border-slate-100 bg-white p-2 flex flex-col justify-between hover:border-primary transition-all cursor-pointer ${i === 12 ? 'ring-2 ring-primary' : ''}`}>
-                              <span className="text-[10px] font-black">{i + 1}</span>
-                              <div className="h-1 bg-primary/20 rounded-full overflow-hidden">
-                                <div className="h-full bg-primary" style={{ width: `${Math.random() * 100}%` }}></div>
-                              </div>
-                           </div>
-                         ))}
-                       </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -582,143 +581,205 @@ const App: React.FC = () => {
     }
 
     if (bookingStep === 'calendar') {
-      const monthStart = startOfMonth(currentMonth);
-      const monthEnd = endOfMonth(monthStart);
-      const startDate = startOfWeek(monthStart);
-      const endDate = endOfWeek(monthEnd);
-      const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
+      const facilityCourts = Array.from({ length: selectedCourt?.numberOfCourts || 8 }, (_, i) => `Court ${i + 1}`);
+      const timeSlots = [
+        '8:00 AM - 9:00 AM', '9:00 AM - 10:00 AM', '10:00 AM - 11:00 AM', '11:00 AM - 12:00 PM',
+        '12:00 PM - 1:00 PM', '1:00 PM - 2:00 PM', '2:00 PM - 3:00 PM', '3:00 PM - 4:00 PM',
+        '4:00 PM - 5:00 PM', '5:00 PM - 6:00 PM', '6:00 PM - 7:00 PM', '7:00 PM - 8:00 PM',
+        '8:00 PM - 9:00 PM', '9:00 PM - 10:00 PM', '10:00 PM - 11:00 PM', '11:00 PM - 12:00 AM'
+      ];
+
+      const getSlotStatus = (court: string, time: string) => {
+        const isSelected = selectedSlots.some(s => s.court === court && s.time === time);
+        if (isSelected) return 'selected';
+        
+        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+        const isBooked = bookedSlots.some(s => s.facilityId === selectedCourt?.id && s.date === dateStr && s.court === court && s.time === time);
+        if (isBooked) return 'booked';
+        
+        if (time.includes('10:00 PM') || time.includes('11:00 PM')) {
+          return 'closing';
+        }
+        
+        if (time.includes('5:00 PM') || time.includes('6:00 PM') || time.includes('7:00 PM')) {
+          if (court === 'Court 4' || court === 'Court 5' || court === 'Court 6') {
+            return 'open-play';
+          }
+        }
+        
+        return 'available';
+      };
+
+      const toggleSlot = (court: string, time: string) => {
+        setSelectedSlots(prev => {
+          const exists = prev.some(s => s.court === court && s.time === time);
+          if (exists) {
+            return prev.filter(s => !(s.court === court && s.time === time));
+          } else {
+            if (prev.length >= 9) return prev; // Max 9 slots
+            return [...prev, { court, time }];
+          }
+        });
+      };
+
+      const totalPrice = selectedSlots.length * (selectedCourt?.price || 0);
 
       return (
-        <div className="max-w-4xl mx-auto animate-in slide-in-from-bottom-12 duration-500 pb-20">
-          <div className="bg-white rounded-[4rem] shadow-2xl p-12 lg:p-20 border border-slate-100 space-y-12">
-          <div className="text-center space-y-4">
-            <div className="w-20 h-20 bg-primary text-white rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-primary/20">
-              <i className="fas fa-calendar-alt text-3xl"></i>
-            </div>
-            <h2 className="text-5xl font-black text-primary uppercase tracking-tighter">Calendar Sync.</h2>
-            <p className="text-slate-500 font-bold">Pick your preferred date and time slot synced with our live calendar.</p>
-            
-            {!isGoogleAuthenticated ? (
-              <button 
-                onClick={handleGoogleConnect}
-                className="mt-4 bg-white text-primary border-2 border-primary px-8 py-4 rounded-[1.5rem] font-black hover:bg-primary hover:text-white transition-all flex items-center gap-3 mx-auto uppercase text-xs tracking-[0.2em] shadow-lg shadow-primary/5"
-              >
-                <i className="fab fa-google"></i> Connect Google Calendar
-              </button>
-            ) : (
-              <div className="flex items-center justify-center gap-4 mt-4">
-                <span className="text-primary font-black text-xs uppercase tracking-widest flex items-center gap-2 bg-primary-extralight px-4 py-2 rounded-full">
-                  <i className="fas fa-check-circle"></i> Connected to Google
-                </span>
-                <button onClick={handleGoogleLogout} className="text-slate-400 hover:text-red-500 font-black text-[10px] uppercase tracking-widest transition-colors">Disconnect</button>
+        <div className="max-w-[1200px] mx-auto animate-in slide-in-from-bottom-12 duration-500 pb-40">
+          
+          <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+              <div>
+                <h2 className="text-3xl font-black text-slate-800 tracking-tight">Book a Court</h2>
+                <p className="text-slate-500 mt-1">Select a date and time to reserve your spot.</p>
               </div>
-            )}
+              <div className="flex items-center gap-4">
+                <button className="w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors">
+                  <i className="fas fa-sync-alt"></i>
+                </button>
+                <div className="relative">
+                  <div 
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 min-w-[200px] cursor-pointer hover:bg-slate-50 transition-colors"
+                    onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+                  >
+                    <i className="far fa-calendar text-slate-400"></i>
+                    <span className="font-medium text-slate-700">{format(selectedDate, 'MMMM do, yyyy')}</span>
+                  </div>
+                  
+                  {isDatePickerOpen && (
+                    <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 z-50 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 w-72">
+                       {/* Calendar Header */}
+                       <div className="flex justify-between items-center mb-4">
+                         <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-slate-50 rounded-lg transition-colors"><i className="fas fa-chevron-left text-slate-400"></i></button>
+                         <span className="font-bold text-slate-700">{format(currentMonth, 'MMMM yyyy')}</span>
+                         <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 hover:bg-slate-50 rounded-lg transition-colors"><i className="fas fa-chevron-right text-slate-400"></i></button>
+                       </div>
+                       {/* Calendar Grid */}
+                       <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                           <div key={day} className="text-[10px] font-black uppercase text-slate-400 py-1">{day}</div>
+                         ))}
+                       </div>
+                       <div className="grid grid-cols-7 gap-1">
+                         {eachDayOfInterval({ start: startOfWeek(startOfMonth(currentMonth)), end: endOfWeek(endOfMonth(currentMonth)) }).map(date => {
+                           const isSelected = isSameDay(date, selectedDate);
+                           const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
+                           return (
+                             <button
+                               key={date.toISOString()}
+                               onClick={() => { setSelectedDate(date); setIsDatePickerOpen(false); }}
+                               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors mx-auto
+                                 ${isSelected ? 'bg-primary text-white font-bold shadow-md' : 'hover:bg-slate-100'}
+                                 ${!isCurrentMonth && !isSelected ? 'text-slate-300' : 'text-slate-700'}
+                               `}
+                             >
+                               {date.getDate()}
+                             </button>
+                           );
+                         })}
+                       </div>
+                    </div>
+                  )}
+                </div>
+                <button className="w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors">
+                  <i className="fas fa-map-marker-alt"></i>
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 text-sm font-medium mb-8">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 bg-white text-slate-600"><div className="w-3 h-3 rounded-full border border-slate-300"></div> Available</div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#113f59] text-white"><div className="w-3 h-3 rounded-full bg-white/20"></div> Selected</div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#00a651] text-white"><div className="w-3 h-3 rounded-full bg-white/20"></div> Booked</div>
+            </div>
+
+            <div className="overflow-x-auto border border-slate-200 rounded-2xl">
+              <table className="w-full text-sm text-center border-collapse min-w-[1000px] table-fixed">
+                <thead>
+                  <tr>
+                    <th className="p-4 border-b border-r border-slate-200 bg-slate-50 w-40 font-bold text-slate-500 uppercase text-[10px] tracking-widest">Time</th>
+                    {facilityCourts.map(court => (
+                      <th key={court} className="p-4 border-b border-r border-slate-200 bg-white font-black text-slate-800">{court}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {timeSlots.map(time => (
+                    <tr key={time}>
+                      <td className="p-3 border-b border-r border-slate-200 bg-white text-[10px] font-bold text-slate-500 whitespace-nowrap">{time}</td>
+                      {facilityCourts.map(court => {
+                        const status = getSlotStatus(court, time);
+                        
+                        let cellClasses = "p-2 border-b border-r border-slate-200 relative cursor-pointer transition-colors h-16 ";
+                        let content = null;
+                        
+                        if (status === 'selected') {
+                          cellClasses += "bg-[#113f59] border-[#113f59]";
+                          content = <i className="fas fa-check text-white text-xl"></i>;
+                        } else if (status === 'booked') {
+                          cellClasses += "bg-[#e6f7ed] border-[#00a651] cursor-not-allowed";
+                          content = <div className="text-[#00a651] text-[10px] font-bold flex items-center justify-center gap-1"><i className="far fa-clock"></i> {time}</div>;
+                        } else if (status === 'open-play') {
+                          cellClasses += "bg-[#f4e6ff] border-[#a855f7] cursor-not-allowed";
+                          content = <div className="text-[#a855f7] text-[10px] font-bold uppercase tracking-widest">Open-Play</div>;
+                        } else if (status === 'closing') {
+                          cellClasses += "bg-[#f8fafc] cursor-not-allowed";
+                          content = <div className="text-slate-400 text-[10px] font-bold flex flex-col"><span>Closing Session</span><span className="font-normal">(1 hr)</span></div>;
+                        } else {
+                          cellClasses += "bg-white hover:bg-slate-50";
+                        }
+                        
+                        return (
+                          <td 
+                            key={`${court}-${time}`} 
+                            className={cellClasses}
+                            onClick={() => {
+                              if (status === 'available' || status === 'selected') {
+                                toggleSlot(court, time);
+                              }
+                            }}
+                          >
+                            {content}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8">
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-black uppercase text-xs tracking-widest text-primary">Select Date</h3>
-                  <div className="flex gap-2">
-                    <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-slate-100 rounded-lg"><i className="fas fa-chevron-left text-xs"></i></button>
-                    <span className="text-xs font-black uppercase tracking-widest">{format(currentMonth, 'MMMM yyyy')}</span>
-                    <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 hover:bg-slate-100 rounded-lg"><i className="fas fa-chevron-right text-xs"></i></button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-7 gap-2">
-                   {['S','M','T','W','T','F','S'].map((d, i) => <div key={`${d}-${i}`} className="text-center text-[10px] font-black text-slate-300">{d}</div>)}
-                   {calendarDays.map((day, i) => {
-                     const isCurrentMonth = format(day, 'M') === format(currentMonth, 'M');
-                     const isSelected = isSameDay(day, selectedDate);
-                     const hasEvents = calendarEvents.some(e => {
-                       const eventDate = e.start?.dateTime || e.start?.date;
-                       return eventDate && isSameDay(new Date(eventDate), day);
-                     });
-
-                     return (
-                       <button 
-                         key={i} 
-                         onClick={() => setSelectedDate(day)}
-                         className={`h-10 w-10 rounded-xl flex flex-col items-center justify-center text-xs font-black transition-all relative
-                           ${isSelected ? 'bg-primary text-white shadow-lg scale-110' : 
-                             isCurrentMonth ? 'hover:bg-slate-50 text-slate-800' : 'text-slate-200'}
-                         `}
-                        >
-                         {format(day, 'd')}
-                         {hasEvents && !isSelected && <span className="absolute bottom-1 w-1 h-1 bg-primary rounded-full"></span>}
-                       </button>
-                     );
-                   })}
-                </div>
+          {/* Floating Action Bar */}
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-slate-100 p-6 flex items-center gap-12 z-50 animate-in slide-in-from-bottom-8">
+            <button onClick={() => setBookingStep('details')} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+              <i className="fas fa-times"></i>
+            </button>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Selected Slots</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black text-[#113f59]">{selectedSlots.length}</span>
+                <span className="text-sm font-bold text-slate-400">slots <span className="font-normal text-slate-300">/ 9 max</span></span>
               </div>
-              <div className="space-y-6">
-                <h3 className="font-black uppercase text-xs tracking-widest text-primary">Available Slots</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {['08:00 AM', '10:00 AM', '01:00 PM', '03:00 PM', '06:00 PM', '08:00 PM'].map(slot => {
-                    const isSelected = selectedTime === slot;
-                    return (
-                      <button 
-                        key={slot} 
-                        onClick={() => setSelectedTime(slot)}
-                        className={`border-2 p-5 rounded-2xl transition-all font-black text-xs text-center active:scale-95
-                          ${isSelected ? 'border-primary bg-primary text-white shadow-xl' : 'border-slate-100 hover:border-primary hover:bg-slate-50 text-slate-800'}
-                        `}
-                      >
-                        {slot}
-                      </button>
-                    );
-                  })}
-                </div>
-                
-                {isGoogleAuthenticated && calendarEvents.length > 0 && (
-                  <div className="mt-6 p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Your Google Events</h4>
-                    <div className="space-y-3">
-                      {calendarEvents
-                        .filter(e => {
-                          const eventDate = e.start?.dateTime || e.start?.date;
-                          return eventDate && isSameDay(new Date(eventDate), selectedDate);
-                        })
-                        .map((e, idx) => (
-                          <div key={idx} className="flex items-center gap-3 text-[10px] font-bold text-slate-600">
-                            <i className="fas fa-circle text-[6px] text-primary"></i>
-                            <span className="truncate">{e.summary}</span>
-                            <span className="ml-auto text-slate-300">
-                              {e.start?.dateTime ? format(new Date(e.start.dateTime), 'HH:mm') : 'All Day'}
-                            </span>
-                          </div>
-                        ))
-                      }
-                      {calendarEvents.filter(e => {
-                          const eventDate = e.start?.dateTime || e.start?.date;
-                          return eventDate && isSameDay(new Date(eventDate), selectedDate);
-                        }).length === 0 && (
-                        <p className="text-[10px] text-slate-300 italic">No events for this day</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <p className="text-sm font-black text-slate-800 mt-1">Total: ₱{totalPrice}</p>
             </div>
-
-            <div className="flex gap-4 pt-10">
-              <button onClick={() => setBookingStep('details')} className="flex-1 py-6 rounded-[2rem] font-black text-primary bg-slate-50 hover:bg-slate-100 transition uppercase tracking-widest text-sm">Cancel</button>
-              <button 
-                disabled={!selectedTime}
-                onClick={() => setBookingStep('payment')} 
-                className={`flex-1 py-6 rounded-[2rem] font-black transition shadow-2xl uppercase tracking-widest text-sm
-                  ${selectedTime ? 'bg-primary text-white hover:bg-slate-800' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}
-                `}
-              >
-                Continue to Payment
-              </button>
-            </div>
+            <button 
+              disabled={selectedSlots.length === 0}
+              onClick={() => setBookingStep('payment')}
+              className={`px-8 py-4 rounded-xl font-black text-white flex items-center gap-3 transition-all
+                ${selectedSlots.length > 0 ? 'bg-[#113f59] hover:bg-[#0a2a3d] shadow-xl' : 'bg-slate-300 cursor-not-allowed'}
+              `}
+            >
+              Proceed to Pay <i className="fas fa-chevron-right text-xs"></i>
+            </button>
           </div>
         </div>
       );
     }
 
     if (bookingStep === 'payment') {
+      const totalPrice = selectedSlots.length * (selectedCourt?.price || 0);
+      
       return (
         <div className="max-w-4xl mx-auto animate-in slide-in-from-right-12 duration-500 pb-20">
           <div className="bg-white rounded-[4rem] shadow-2xl p-12 lg:p-20 border border-slate-100 space-y-12">
@@ -733,7 +794,7 @@ const App: React.FC = () => {
             <div className="flex flex-col md:flex-row gap-12 items-center pt-8">
               <div className="flex-1 space-y-8 w-full">
                 <div className="space-y-6">
-                  <h3 className="font-black uppercase text-xs tracking-widest text-primary">Court Contact Details</h3>
+                  <h3 className="font-black uppercase text-xs tracking-widest text-primary">Booking Summary</h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-4 p-6 bg-slate-50 rounded-3xl border border-slate-100">
                       <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-primary">
@@ -747,21 +808,21 @@ const App: React.FC = () => {
                     
                     <div className="flex items-center gap-4 p-6 bg-slate-50 rounded-3xl border border-slate-100">
                       <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-primary">
-                        <i className="fas fa-phone-alt text-xl"></i>
+                        <i className="far fa-clock text-xl"></i>
                       </div>
                       <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Phone Number</p>
-                        <p className="font-black text-lg text-primary">{selectedCourt.phone || '+1 (555) 000-0000'}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Selected Slots</p>
+                        <p className="font-black text-lg text-primary">{selectedSlots.length} slot(s)</p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-4 p-6 bg-slate-50 rounded-3xl border border-slate-100">
                       <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-primary">
-                        <i className="fas fa-envelope text-xl"></i>
+                        <i className="fas fa-money-bill-wave text-xl"></i>
                       </div>
                       <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Email Address</p>
-                        <p className="font-black text-lg text-primary">{selectedCourt.email || 'support@sportsync.com'}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Amount</p>
+                        <p className="font-black text-lg text-primary">₱{totalPrice}</p>
                       </div>
                     </div>
                   </div>
@@ -788,14 +849,98 @@ const App: React.FC = () => {
 
             <div className="space-y-4 pt-10">
               <button 
-                onClick={() => setBookingStep('success')}
+                onClick={() => {
+                  if (!selectedCourt) return;
+                  setShowUserFormModal(true);
+                }}
                 className="w-full py-8 rounded-[2.5rem] font-black bg-primary text-white hover:bg-slate-800 transition shadow-2xl uppercase tracking-[0.2em] text-sm active:scale-95"
               >
-                Continue to Confirmation
+                Confirm Payment
               </button>
               <button onClick={() => setBookingStep('calendar')} className="w-full text-slate-300 font-black uppercase text-[10px] tracking-widest hover:text-primary transition-colors">Go Back</button>
             </div>
           </div>
+
+          {showUserFormModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="bg-white rounded-[3rem] shadow-2xl p-10 max-w-md w-full border border-slate-100 animate-in zoom-in-95 duration-200">
+                <div className="text-center space-y-2 mb-8">
+                  <h3 className="text-3xl font-black text-primary tracking-tighter uppercase">Your Details</h3>
+                  <p className="text-slate-500 font-medium text-sm">Please provide your information for the receipt.</p>
+                </div>
+                
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!selectedCourt) return;
+                    const dateStr = format(selectedDate, 'yyyy-MM-dd');
+                    const newBookedSlots = selectedSlots.map(s => ({
+                      facilityId: selectedCourt.id,
+                      date: dateStr,
+                      court: s.court,
+                      time: s.time
+                    }));
+                    setBookedSlots(prev => [...prev, ...newBookedSlots]);
+                    setShowUserFormModal(false);
+                    setBookingStep('success');
+                  }}
+                  className="space-y-6"
+                >
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Full Name</label>
+                      <input 
+                        required
+                        type="text" 
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                        className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium"
+                        placeholder="John Doe"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Email Address</label>
+                      <input 
+                        required
+                        type="email" 
+                        value={userEmail}
+                        onChange={(e) => setUserEmail(e.target.value)}
+                        className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium"
+                        placeholder="john@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Phone Number</label>
+                      <input 
+                        required
+                        type="tel" 
+                        value={userPhone}
+                        onChange={(e) => setUserPhone(e.target.value)}
+                        className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium"
+                        placeholder="+63 912 345 6789"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 flex gap-4">
+                    <button 
+                      type="button"
+                      onClick={() => setShowUserFormModal(false)}
+                      className="flex-1 py-4 rounded-2xl font-black text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition uppercase tracking-widest text-xs"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit"
+                      className="flex-1 py-4 rounded-2xl font-black bg-primary text-white hover:bg-slate-800 transition shadow-xl uppercase tracking-widest text-xs active:scale-95"
+                    >
+                      Complete
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
@@ -834,6 +979,8 @@ const App: React.FC = () => {
     }
 
     if (bookingStep === 'confirmation') {
+      const totalPrice = selectedSlots.length * (selectedCourt?.price || 0);
+
       return (
         <div className="max-w-4xl mx-auto animate-in slide-in-from-bottom-12 duration-700 pb-20">
            <div className="bg-white rounded-[4rem] shadow-2xl p-12 lg:p-20 border border-slate-100 space-y-12">
@@ -841,14 +988,14 @@ const App: React.FC = () => {
                 <Logo />
                 <div className="text-right">
                   <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">Confirmation Number</p>
-                  <p className="font-black text-primary text-xl">SS-BK-00192</p>
+                  <p className="font-black text-primary text-xl">SS-BK-{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}</p>
                 </div>
               </div>
 
               <div className="space-y-10">
                 <div className="space-y-2">
                   <h3 className="text-4xl font-black text-primary tracking-tighter uppercase">Email Confirmation.</h3>
-                  <p className="text-slate-400 font-bold">A copy of this receipt has been sent to john.doe@athlete.com</p>
+                  <p className="text-slate-400 font-bold">A copy of this receipt has been sent to your email.</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-4">
@@ -859,24 +1006,30 @@ const App: React.FC = () => {
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">Date & Time</p>
-                        <p className="font-black text-primary text-lg">Monday, July 15 • 10:00 AM</p>
+                        <p className="font-black text-primary text-lg">{format(selectedDate, 'EEEE, MMMM do')} • {selectedSlots.length} slot(s)</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">Booked By</p>
+                        <p className="font-black text-primary text-lg">{userName || 'Guest'}</p>
+                        <p className="text-sm font-bold text-slate-400">{userEmail}</p>
+                        <p className="text-sm font-bold text-slate-400">{userPhone}</p>
                       </div>
                    </div>
                    <div className="space-y-8">
                       <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">Amount Paid</p>
-                        <p className="font-black text-primary text-3xl">₱{selectedCourt.price}.00</p>
+                        <p className="font-black text-primary text-3xl">₱{totalPrice}.00</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">Access Code</p>
-                        <p className="font-black text-emerald-600 text-2xl tracking-[0.3em]">C-9921</p>
+                        <p className="font-black text-emerald-600 text-2xl tracking-[0.3em]">C-{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}</p>
                       </div>
                    </div>
                 </div>
 
                 <div className="pt-10 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
                   <button onClick={() => window.print()} className="flex-1 py-5 rounded-2xl font-black border border-slate-200 text-primary uppercase text-xs tracking-widest hover:bg-slate-50 transition"><i className="fas fa-print mr-2"></i> Print Receipt</button>
-                  <button onClick={() => { setActiveTab('home'); setBookingStep('details'); }} className="flex-1 py-5 rounded-2xl font-black bg-primary text-white shadow-xl uppercase text-xs tracking-widest hover:bg-slate-800 transition">Back to Home</button>
+                  <button onClick={() => { setActiveTab('home'); setBookingStep('details'); setSelectedSlots([]); }} className="flex-1 py-5 rounded-2xl font-black bg-primary text-white shadow-xl uppercase text-xs tracking-widest hover:bg-slate-800 transition">Back to Home</button>
                 </div>
               </div>
            </div>
@@ -926,7 +1079,10 @@ const App: React.FC = () => {
                      <span className="text-[11px] text-slate-400 font-black uppercase tracking-widest">{event.participants}+ Joined</span>
                    </div>
                    <button 
-                     onClick={() => setSelectedEvent(event)}
+                     onClick={() => {
+                       setSelectedEvent(event);
+                       setEventRegistrationStep('details');
+                     }}
                      className="text-primary font-black text-xs uppercase tracking-[0.2em] hover:translate-x-3 transition-transform flex items-center gap-3"
                    >
                      Details <i className="fas fa-arrow-right"></i>
@@ -949,54 +1105,153 @@ const App: React.FC = () => {
             </button>
             
             <div className="p-12 sm:p-16 space-y-10">
-              <div className="flex flex-col sm:flex-row gap-8 items-start">
-                <div className="w-32 h-32 bg-primary-extralight rounded-[2.5rem] flex items-center justify-center text-primary border border-primary/10 shadow-sm flex-shrink-0">
-                  <i className={`fas ${selectedEvent.icon} text-5xl`}></i>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-black text-white bg-primary px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-sm">Tournament</span>
-                    <span className="text-xs text-slate-400 font-black tracking-tighter">{selectedEvent.date}</span>
+              {eventRegistrationStep === 'details' && (
+                <>
+                  <div className="flex flex-col sm:flex-row gap-8 items-start">
+                    <div className="w-32 h-32 bg-primary-extralight rounded-[2.5rem] flex items-center justify-center text-primary border border-primary/10 shadow-sm flex-shrink-0">
+                      <i className={`fas ${selectedEvent.icon} text-5xl`}></i>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-black text-white bg-primary px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-sm">Tournament</span>
+                        <span className="text-xs text-slate-400 font-black tracking-tighter">{selectedEvent.date}</span>
+                      </div>
+                      <h2 className="text-5xl font-black text-primary tracking-tighter uppercase leading-tight">{selectedEvent.title}</h2>
+                    </div>
                   </div>
-                  <h2 className="text-5xl font-black text-primary tracking-tighter uppercase leading-tight">{selectedEvent.title}</h2>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 space-y-2">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Location</p>
-                  <p className="font-black text-primary text-xl uppercase">{selectedEvent.locationName}</p>
-                  <p className="text-sm text-slate-500 font-medium">{selectedEvent.address}</p>
-                </div>
-                <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 space-y-2">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Registration Fee</p>
-                  <p className="font-black text-primary text-3xl uppercase">{selectedEvent.registrationFee}</p>
-                  <p className="text-sm text-slate-500 font-medium">Includes event shirt & hydration</p>
-                </div>
-              </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 space-y-2">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Location</p>
+                      <p className="font-black text-primary text-xl uppercase">{selectedEvent.locationName}</p>
+                      <p className="text-sm text-slate-500 font-medium">{selectedEvent.address}</p>
+                    </div>
+                    <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 space-y-2">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Registration Fee</p>
+                      <p className="font-black text-primary text-3xl uppercase">{selectedEvent.registrationFee}</p>
+                      <p className="text-sm text-slate-500 font-medium">Includes event shirt & hydration</p>
+                    </div>
+                  </div>
 
-              <div className="space-y-4">
-                <h3 className="font-black text-xl text-primary uppercase tracking-tight">Event Details</h3>
-                <p className="text-slate-500 font-medium leading-relaxed text-lg">{selectedEvent.description}</p>
-              </div>
+                  <div className="space-y-4">
+                    <h3 className="font-black text-xl text-primary uppercase tracking-tight">Event Details</h3>
+                    <p className="text-slate-500 font-medium leading-relaxed text-lg">{selectedEvent.description}</p>
+                  </div>
 
-              <div className="pt-8 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
-                <button className="flex-1 bg-primary text-white py-6 rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-sm active:scale-95">
-                  Register Now
-                </button>
-                <button 
-                  onClick={() => {
-                    const court = COURTS.find(c => c.id === selectedEvent.courtId);
-                    if (court) {
-                      setSelectedEvent(null);
-                      handleCourtSelect(court);
-                    }
-                  }}
-                  className="flex-1 bg-slate-50 text-primary py-6 rounded-[2rem] font-black hover:bg-slate-100 transition border border-slate-200 uppercase tracking-widest text-sm active:scale-95"
-                >
-                  View Facility
-                </button>
-              </div>
+                  <div className="pt-8 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
+                    <button 
+                      onClick={() => setEventRegistrationStep('form')}
+                      className="flex-1 bg-primary text-white py-6 rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-sm active:scale-95"
+                    >
+                      Register Now
+                    </button>
+                    <button 
+                      onClick={() => {
+                        const court = COURTS.find(c => c.id === selectedEvent.courtId);
+                        if (court) {
+                          setSelectedEvent(null);
+                          handleCourtSelect(court);
+                        }
+                      }}
+                      className="flex-1 bg-slate-50 text-primary py-6 rounded-[2rem] font-black hover:bg-slate-100 transition border border-slate-200 uppercase tracking-widest text-sm active:scale-95"
+                    >
+                      View Facility
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {eventRegistrationStep === 'form' && (
+                <div className="space-y-8">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-3xl font-black text-primary tracking-tighter uppercase">Registration</h3>
+                    <button onClick={() => setEventRegistrationStep('details')} className="text-slate-400 hover:text-primary font-black uppercase text-xs tracking-widest transition-colors">Go Back</button>
+                  </div>
+                  <div className="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 space-y-6">
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Full Name</label>
+                      <input 
+                        type="text" 
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                        className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium"
+                        placeholder="John Doe"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Email Address</label>
+                      <input 
+                        type="email" 
+                        value={userEmail}
+                        onChange={(e) => setUserEmail(e.target.value)}
+                        className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium"
+                        placeholder="john@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Mobile Number</label>
+                      <input 
+                        type="tel" 
+                        value={userPhone}
+                        onChange={(e) => setUserPhone(e.target.value)}
+                        className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium"
+                        placeholder="+63 900 000 0000"
+                      />
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      if (userName && userEmail && userPhone) {
+                        setEventRegistrationStep('success');
+                      } else {
+                        alert('Please fill in all fields');
+                      }
+                    }}
+                    className="w-full bg-primary text-white py-6 rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-sm active:scale-95"
+                  >
+                    Submit Registration
+                  </button>
+                </div>
+              )}
+
+              {eventRegistrationStep === 'success' && (
+                <div className="text-center space-y-8 py-8">
+                  <div className="w-32 h-32 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-primary text-6xl shadow-inner border border-slate-50">
+                    <i className="fas fa-check-circle"></i>
+                  </div>
+                  <div className="space-y-4">
+                    <h2 className="text-5xl font-black text-primary tracking-tighter uppercase">Registered!</h2>
+                    <p className="text-slate-500 text-lg font-medium max-w-sm mx-auto">You're all set for <span className="text-primary font-black">{selectedEvent.title}</span>.</p>
+                  </div>
+                  
+                  <div className="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 text-left space-y-4 max-w-sm mx-auto">
+                    <h3 className="font-black uppercase text-xs tracking-widest text-primary mb-6">Registration Receipt</h3>
+                    <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Name</span>
+                      <span className="text-sm font-black text-primary">{userName}</span>
+                    </div>
+                    <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Email</span>
+                      <span className="text-sm font-black text-primary">{userEmail}</span>
+                    </div>
+                    <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Phone</span>
+                      <span className="text-sm font-black text-primary">{userPhone}</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Fee</span>
+                      <span className="text-lg font-black text-primary">{selectedEvent.registrationFee}</span>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={() => setSelectedEvent(null)}
+                    className="w-full max-w-sm mx-auto block bg-primary text-white py-6 rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-sm active:scale-95"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1005,7 +1260,7 @@ const App: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen pb-20 bg-white">
+    <div className="min-h-screen bg-white">
       <header className="sticky top-0 z-40 glass border-b border-slate-100 h-28 flex items-center">
         <div className="max-w-7xl mx-auto px-8 w-full flex items-center justify-between">
           <div onClick={() => { setActiveTab('home'); setSelectedCourt(null); setBookingStep('details'); window.scrollTo({top: 0, behavior: 'smooth'}); }}>
@@ -1059,7 +1314,7 @@ const App: React.FC = () => {
                </div>
                <div className="space-y-4">
                   <h2 className="text-5xl font-black text-primary tracking-tighter uppercase">John Doe</h2>
-                  <p className="text-slate-400 font-black uppercase text-sm tracking-[0.4em]">Athlete Profile • EST 2026</p>
+                  <p className="text-slate-400 font-black uppercase text-sm tracking-[0.4em]">Athlete Profile • EST 2024</p>
                </div>
                <div className="grid grid-cols-2 gap-8 mt-16">
                   <div className="bg-slate-50 p-12 rounded-[3.5rem] border border-slate-100">
@@ -1132,35 +1387,35 @@ const App: React.FC = () => {
 
 const CourtCard: React.FC<{court: Court, onBook: () => void}> = ({ court, onBook }) => {
   return (
-    <div className="bg-white rounded-[4rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 group border border-slate-100 flex flex-col h-full active:scale-[0.98]">
-      <div className="relative h-72 overflow-hidden">
+    <div className="bg-white rounded-[3rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 group border border-slate-100 flex flex-col h-full active:scale-[0.98]">
+      <div className="relative h-64 overflow-hidden shrink-0">
         <img src={court.image} alt={court.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 grayscale-[40%] group-hover:grayscale-0" />
         <div className="absolute inset-0 bg-primary-dark/10 group-hover:bg-transparent transition-colors"></div>
-        <div className="absolute top-8 left-8">
-           <span className="bg-white/95 backdrop-blur-md text-primary px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl border border-primary/5 inline-block">{court.type}</span>
+        <div className="absolute top-6 left-6">
+           <span className="bg-white/95 backdrop-blur-md text-primary px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] shadow-xl border border-primary/5 inline-block">{court.type}</span>
         </div>
-        <div className="absolute bottom-8 left-8 bg-primary text-white px-5 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase shadow-xl">
-          Verified
+        <div className="absolute bottom-6 left-6 bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center shadow-xl">
+          <i className="fas fa-check text-xs"></i>
         </div>
       </div>
-      <div className="p-8 space-y-5 flex-1 flex flex-col bg-white">
+      <div className="p-6 sm:p-8 space-y-4 flex-1 flex flex-col bg-white">
         <div className="flex justify-between items-start gap-3">
-          <h3 className="font-black text-2xl text-primary group-hover:text-primary-light transition-colors line-clamp-2 leading-tight tracking-tighter uppercase">{court.name}</h3>
-          <div className="flex items-center text-primary text-xs font-black bg-primary-extralight px-3 py-1.5 rounded-xl border border-primary/10 shadow-sm flex-shrink-0">
-            <i className="fas fa-star mr-1.5 text-primary"></i> {court.rating}
+          <h3 className="font-black text-xl text-primary group-hover:text-primary-light transition-colors line-clamp-2 leading-tight tracking-tighter uppercase">{court.name}</h3>
+          <div className="flex items-center text-primary text-[10px] font-black bg-primary-extralight px-2.5 py-1 rounded-lg border border-primary/10 shadow-sm flex-shrink-0">
+            <i className="fas fa-star mr-1 text-primary"></i> {court.rating}
           </div>
         </div>
-        <p className="text-slate-400 text-xs font-black line-clamp-2 flex items-start uppercase tracking-widest leading-relaxed"><i className="fas fa-map-pin mr-2 text-primary mt-0.5"></i>{court.location}</p>
+        <p className="text-slate-400 text-[10px] font-black line-clamp-2 flex items-start uppercase tracking-widest leading-relaxed"><i className="fas fa-map-pin mr-2 text-primary mt-0.5 shrink-0"></i><span className="leading-tight">{court.location}</span></p>
         <div className="flex flex-wrap gap-2">
-          {court.amenities.slice(0, 3).map(a => <span key={a} className="text-[9px] font-black bg-slate-50 text-slate-400 px-3 py-1.5 rounded-xl border border-slate-100 group-hover:bg-primary-extralight group-hover:text-primary transition-all duration-300 uppercase tracking-tighter">{a}</span>)}
+          {court.amenities.slice(0, 3).map(a => <span key={a} className="text-[8px] font-black bg-slate-50 text-slate-400 px-2.5 py-1 rounded-lg border border-slate-100 group-hover:bg-primary-extralight group-hover:text-primary transition-all duration-300 uppercase tracking-tighter">{a}</span>)}
         </div>
-        <div className="pt-6 flex items-center justify-between border-t border-slate-100 mt-auto">
-          <div>
-            <p className="text-3xl font-black text-primary tracking-tighter">₱{court.price}<span className="text-[10px] text-slate-300 font-black ml-1 uppercase tracking-widest">/hr</span></p>
+        <div className="pt-5 flex items-center justify-between border-t border-slate-100 mt-auto gap-2">
+          <div className="shrink-0">
+            <p className="text-2xl font-black text-primary tracking-tighter">₱{court.price}<span className="text-[9px] text-slate-300 font-black ml-1 uppercase tracking-widest">/hr</span></p>
           </div>
           <button 
             onClick={onBook}
-            className="bg-primary text-white px-8 py-4 rounded-2xl font-black hover:bg-primary-dark transition-all duration-500 shadow-xl shadow-primary/20 active:scale-90 text-[10px] uppercase tracking-widest"
+            className="bg-primary text-white px-5 py-3 rounded-xl font-black hover:bg-primary-dark transition-all duration-500 shadow-xl shadow-primary/20 active:scale-90 text-[9px] uppercase tracking-widest shrink-0"
           >
             BOOK SLOT
           </button>
