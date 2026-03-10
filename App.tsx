@@ -144,6 +144,8 @@ const App: React.FC = () => {
     { facilityId: 'c2', date: format(new Date(), 'yyyy-MM-dd'), court: 'Court 3', time: '2:00 PM - 3:00 PM' },
   ]);
   const [showUserFormModal, setShowUserFormModal] = useState(false);
+  const [showPostEventForm, setShowPostEventForm] = useState(false);
+  const [postEventData, setPostEventData] = useState({ eventName: '', sport: '', date: '', time: '', location: '', description: '', contactName: '', contactEmail: '', contactPhone: '' });
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userPhone, setUserPhone] = useState('');
@@ -634,9 +636,6 @@ const App: React.FC = () => {
                 <p className="text-slate-500 mt-1">Select a date and time to reserve your spot.</p>
               </div>
               <div className="flex items-center gap-4">
-                <button className="w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors">
-                  <i className="fas fa-sync-alt"></i>
-                </button>
                 <div className="relative">
                   <div 
                     className="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 min-w-[200px] cursor-pointer hover:bg-slate-50 transition-colors"
@@ -681,9 +680,6 @@ const App: React.FC = () => {
                     </div>
                   )}
                 </div>
-                <button className="w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors">
-                  <i className="fas fa-map-marker-alt"></i>
-                </button>
               </div>
             </div>
 
@@ -1049,7 +1045,7 @@ const App: React.FC = () => {
           <h2 className="text-6xl md:text-7xl font-black leading-[0.9] tracking-tighter uppercase">Local <br/>Events.</h2>
           <p className="text-white/70 text-xl font-medium max-w-xl">Join tournaments, find pickup groups, and scale your game with local athletes.</p>
         </div>
-        <button className="relative z-10 bg-white text-primary px-12 py-6 rounded-[2rem] font-black shadow-2xl hover:bg-slate-100 transition-transform active:scale-95 text-lg uppercase tracking-widest">Post Event</button>
+        <button onClick={() => setShowPostEventForm(true)} className="relative z-10 bg-white text-primary px-12 py-6 rounded-[2rem] font-black shadow-2xl hover:bg-slate-100 transition-transform active:scale-95 text-lg uppercase tracking-widest">Post Event</button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -1092,6 +1088,119 @@ const App: React.FC = () => {
            </div>
          ))}
       </div>
+
+      {showPostEventForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowPostEventForm(false)}></div>
+          <div className="relative bg-white rounded-[3rem] md:rounded-[4rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-slate-100 animate-in zoom-in-95 duration-300">
+            <button
+              onClick={() => setShowPostEventForm(false)}
+              className="absolute top-6 right-6 md:top-8 md:right-8 w-10 h-10 md:w-12 md:h-12 bg-slate-50 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-primary transition-colors z-10"
+            >
+              <i className="fas fa-times text-lg md:text-xl"></i>
+            </button>
+
+            <div className="p-8 sm:p-12 md:p-16 space-y-8">
+              <div className="space-y-3">
+                <span className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-[0.2em] inline-block">Post Your Event</span>
+                <h2 className="text-3xl md:text-5xl font-black text-primary tracking-tighter uppercase leading-tight">Submit an Event</h2>
+                <p className="text-slate-500 font-medium text-sm md:text-base">Fill in the details below and we'll review your event for posting.</p>
+              </div>
+
+              <div className="bg-slate-50 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 space-y-5">
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Event Name *</label>
+                  <input type="text" value={postEventData.eventName} onChange={(e) => setPostEventData({...postEventData, eventName: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="e.g. Weekend Badminton Tournament" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Sport *</label>
+                    <select value={postEventData.sport} onChange={(e) => setPostEventData({...postEventData, sport: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium bg-white">
+                      <option value="">Select sport</option>
+                      <option value="Badminton">Badminton</option>
+                      <option value="Basketball">Basketball</option>
+                      <option value="Pickleball">Pickleball</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Date *</label>
+                    <input type="date" value={postEventData.date} onChange={(e) => setPostEventData({...postEventData, date: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Time</label>
+                    <input type="text" value={postEventData.time} onChange={(e) => setPostEventData({...postEventData, time: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="e.g. 8:00 AM - 5:00 PM" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Location *</label>
+                    <input type="text" value={postEventData.location} onChange={(e) => setPostEventData({...postEventData, location: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="e.g. UM Badminton Court" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Event Description *</label>
+                  <textarea value={postEventData.description} onChange={(e) => setPostEventData({...postEventData, description: e.target.value})} rows={3} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium resize-none" placeholder="Describe your event, rules, fees, etc." />
+                </div>
+              </div>
+
+              <div className="bg-slate-50 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 space-y-5">
+                <h4 className="font-black text-xs text-primary uppercase tracking-widest">Your Contact Info</h4>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Your Name *</label>
+                  <input type="text" value={postEventData.contactName} onChange={(e) => setPostEventData({...postEventData, contactName: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="John Doe" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Email *</label>
+                    <input type="email" value={postEventData.contactEmail} onChange={(e) => setPostEventData({...postEventData, contactEmail: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="john@example.com" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Phone</label>
+                    <input type="tel" value={postEventData.contactPhone} onChange={(e) => setPostEventData({...postEventData, contactPhone: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="+63 900 000 0000" />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  const { eventName, sport, date, location, description, contactName, contactEmail } = postEventData;
+                  if (!eventName || !sport || !date || !location || !description || !contactName || !contactEmail) {
+                    alert('Please fill in all required fields');
+                    return;
+                  }
+                  const subject = encodeURIComponent(`[SportSync Event Submission] ${eventName}`);
+                  const body = encodeURIComponent(
+`EVENT DETAILS
+━━━━━━━━━━━━━━━━━━
+Event Name: ${eventName}
+Sport: ${sport}
+Date: ${date}
+Time: ${postEventData.time || 'TBD'}
+Location: ${location}
+
+Description:
+${description}
+
+ORGANIZER CONTACT
+━━━━━━━━━━━━━━━━━━
+Name: ${contactName}
+Email: ${contactEmail}
+Phone: ${postEventData.contactPhone || 'N/A'}
+`);
+                  window.open(`mailto:astnjt1@gmail.com?subject=${subject}&body=${body}`, '_self');
+                  setShowPostEventForm(false);
+                  setPostEventData({ eventName: '', sport: '', date: '', time: '', location: '', description: '', contactName: '', contactEmail: '', contactPhone: '' });
+                }}
+                className="w-full bg-primary text-white py-5 md:py-6 rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-sm active:scale-95 flex items-center justify-center gap-3"
+              >
+                <i className="fas fa-envelope"></i> Send Event Request
+              </button>
+              <p className="text-center text-xs text-slate-400 font-medium">This will open your email client to send the event details for review.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedEvent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8">
@@ -1345,37 +1454,31 @@ const App: React.FC = () => {
                 <span className="uppercase">SportSync</span>
              </div>
              <p className="text-slate-500 text-2xl leading-relaxed font-bold tracking-tight max-w-sm uppercase">Redefining facility access with minimalist efficiency.</p>
-             <div className="flex gap-6">
-               {['twitter', 'facebook', 'instagram', 'youtube'].map(s => (
-                 <a key={s} href="#" className="w-16 h-16 rounded-[1.5rem] bg-white flex items-center justify-center text-slate-400 hover:text-primary transition-all duration-500 border border-slate-200 hover:-translate-y-2 shadow-sm">
-                   <i className={`fab fa-${s} text-2xl`}></i>
-                 </a>
-               ))}
-             </div>
            </div>
            <div className="md:col-span-2 space-y-10">
-             <h4 className="font-black text-xs uppercase tracking-[0.5em] text-slate-300 uppercase">Quick Links</h4>
+             <h4 className="font-black text-xs uppercase tracking-[0.5em] text-slate-300">Quick Links</h4>
              <ul className="space-y-6 text-lg font-black uppercase">
                 <li><button onClick={() => {setActiveTab('home'); setBookingStep('details'); scrollToBrowse();}} className="hover:text-slate-500 transition">Arenas</button></li>
                 <li><button onClick={() => setActiveTab('community')} className="hover:text-slate-500 transition">Events</button></li>
                 <li><button onClick={() => setActiveTab('about')} className="hover:text-slate-500 transition">About Us</button></li>
              </ul>
            </div>
-           <div className="md:col-span-2 space-y-10">
-             <h4 className="font-black text-xs uppercase tracking-[0.5em] text-slate-300 uppercase">Privacy</h4>
-             <ul className="space-y-6 text-lg font-black uppercase">
-                <li><button className="hover:text-slate-500 transition">Policy</button></li>
-                <li><button className="hover:text-slate-500 transition">Agreement</button></li>
-                <li><button className="hover:text-slate-500 transition">Security</button></li>
+           <div className="md:col-span-5 space-y-10">
+             <h4 className="font-black text-xs uppercase tracking-[0.5em] text-slate-300">Contact Us</h4>
+             <ul className="space-y-6">
+                <li className="flex items-start gap-4">
+                  <i className="fas fa-map-marker-alt text-primary mt-1"></i>
+                  <span className="text-slate-500 font-bold">Forestview Village, Catalunan Grande, Davao City 8000</span>
+                </li>
+                <li className="flex items-center gap-4">
+                  <i className="fas fa-envelope text-primary"></i>
+                  <a href="mailto:astnjt1@gmail.com" className="text-slate-500 font-bold hover:text-primary transition">astnjt1@gmail.com</a>
+                </li>
+                <li className="flex items-center gap-4">
+                  <i className="fas fa-phone text-primary"></i>
+                  <a href="tel:09760432250" className="text-slate-500 font-bold hover:text-primary transition">0976 043 2250</a>
+                </li>
              </ul>
-           </div>
-           <div className="md:col-span-3 space-y-10">
-             <h4 className="font-black text-xs uppercase tracking-[0.5em] text-slate-300 uppercase">Updates</h4>
-             <p className="text-slate-400 font-bold leading-relaxed">Subscribe to local opening alerts.</p>
-             <div className="flex flex-col gap-4">
-               <input type="text" placeholder="athlete@example.com" className="bg-white px-8 py-5 rounded-3xl outline-none font-black placeholder:text-slate-200 border border-slate-200 focus:border-primary transition-colors text-primary" />
-               <button className="bg-primary text-white py-5 rounded-3xl font-black shadow-xl hover:bg-slate-800 transition uppercase tracking-widest text-sm">Subscribe</button>
-             </div>
            </div>
         </div>
       </footer>
