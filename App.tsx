@@ -285,7 +285,7 @@ const App: React.FC = () => {
       </section>
 
       {/* How It Works - overlapping hero */}
-      <section className="relative z-10 -mt-[10rem] md:-mt-[14rem] bg-white rounded-2xl md:rounded-[3rem] shadow-[0_0_60px_20px_rgba(255,255,255,0.35)] md:shadow-[0_0_100px_40px_rgba(255,255,255,0.45)] py-8 px-6 md:py-16 md:px-12 lg:py-16 lg:px-16 overflow-hidden">
+      <section className="relative z-10 -mt-[10rem] md:-mt-[14rem] bg-white rounded-2xl md:rounded-[3rem] shadow-[0_0_60px_20px_rgba(255,255,255,0)] md:shadow-[0_0_100px_40px_rgba(255,255,255,0)] py-8 px-6 md:py-16 md:px-12 lg:py-16 lg:px-16 overflow-hidden">
 
         {/* Desktop: horizontal timeline with curved line */}
         <div className="hidden md:block relative">
