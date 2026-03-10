@@ -320,7 +320,7 @@ const App: React.FC = () => {
         <div className="flex justify-center gap-12 pt-10 text-slate-300 font-black text-xs uppercase tracking-[0.4em]">
            <span>Team Venture</span>
            <span className="text-primary">•</span>
-           <span>EST. 2024</span>
+           <span>EST. 2026</span>
         </div>
       </section>
 
