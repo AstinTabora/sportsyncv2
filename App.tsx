@@ -258,7 +258,7 @@ const App: React.FC = () => {
   const renderHome = () => (
     <div className="space-y-20 animate-in fade-in duration-700">
       {/* Hero Section - full bleed */}
-      <section className="relative h-[480px] md:h-[950px] overflow-hidden flex items-center justify-center text-center p-4 md:p-8 -mt-[7rem] md:-mt-[11rem] pt-[7rem] md:pt-[0rem]" style={{width: '100vw', marginLeft: 'calc(-50vw + 50%)'}}>
+      <section className="relative h-[650px] md:h-[950px] overflow-hidden flex items-center justify-center text-center p-4 md:p-8 -mt-[7rem] md:-mt-[11rem] pt-[7rem] md:pt-[0rem]" style={{width: '100vw', marginLeft: 'calc(-50vw + 50%)'}}>
         <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-105" style={{backgroundImage: 'url("/images/hero-bg.webp")'}}></div>
         <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"></div>
         <div className="relative z-10 max-w-4xl space-y-10 px-4">
@@ -266,17 +266,17 @@ const App: React.FC = () => {
             <h1 className="text-5xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase">Find your <br/>Arena.</h1>
             <p className="text-white/90 text-base md:text-xl font-medium max-w-xl mx-auto leading-relaxed tracking-wide">Book premium Badminton, Pickleball, and Basketball courts in a few clicks.</p>
           </div>
-          <div className="flex bg-white/10 backdrop-blur-md rounded-[2.5rem] p-3 shadow-2xl max-w-xl mx-auto group focus-within:ring-4 focus-within:ring-white/20 transition-all border border-white/20">
+          <div className="flex bg-white/10 backdrop-blur-md rounded-full p-1.5 md:p-3 shadow-2xl max-w-md md:max-w-xl mx-auto group focus-within:ring-4 focus-within:ring-white/20 transition-all border border-white/20">
             <input
               type="text"
               placeholder="Search locations..."
-              className="flex-1 px-6 outline-none text-white placeholder:text-white/60 font-bold bg-transparent"
+              className="flex-1 px-4 md:px-6 outline-none text-white placeholder:text-white/60 font-bold bg-transparent text-sm md:text-base"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <button
               onClick={scrollToBrowse}
-              className="bg-white text-primary px-6 md:px-12 py-4 md:py-5 rounded-[2rem] font-black hover:bg-primary-extralight transition active:scale-95 shadow-xl text-xs md:text-sm uppercase tracking-[0.2em]"
+              className="bg-white text-primary px-5 md:px-12 py-3 md:py-5 rounded-full font-black hover:bg-primary-extralight transition active:scale-95 shadow-xl text-[10px] md:text-sm uppercase tracking-[0.2em]"
             >
               Search
             </button>
@@ -285,7 +285,7 @@ const App: React.FC = () => {
       </section>
 
       {/* How It Works - overlapping hero */}
-      <section className="relative z-10 -mt-[5rem] md:-mt-[12rem] bg-white rounded-2xl md:rounded-[3rem] shadow-2xl shadow-slate-200/60 py-8 px-6 md:py-16 md:px-12 lg:py-16 lg:px-16 overflow-hidden border border-slate-100">
+      <section className="relative z-10 -mt-[10rem] md:-mt-[14rem] bg-white rounded-2xl md:rounded-[3rem] shadow-2xl shadow-slate-200/60 py-8 px-6 md:py-16 md:px-12 lg:py-16 lg:px-16 overflow-hidden border border-slate-100">
 
         {/* Desktop: horizontal timeline with curved line */}
         <div className="hidden md:block relative">
