@@ -260,7 +260,7 @@ const App: React.FC = () => {
       {/* Hero Section - full bleed */}
       <section className="relative h-[650px] md:h-[950px] overflow-hidden flex items-center justify-center text-center p-4 md:p-8 -mt-[7rem] md:-mt-[11rem] pt-[7rem] md:pt-[0rem]" style={{width: '100vw', marginLeft: 'calc(-50vw + 50%)'}}>
         <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-105" style={{backgroundImage: 'url("/images/hero-bg.webp")'}}></div>
-        <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"></div>
+        <div className="absolute inset-0 bg-[#001F12]/50 backdrop-blur-[2px]"></div>
         <div className="relative z-10 max-w-4xl space-y-10 px-4">
           <div className="space-y-6">
             <h1 className="text-5xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase">Plan Less <br/>Play More.</h1>
@@ -1648,39 +1648,39 @@ Phone: ${postEventData.contactPhone || 'N/A'}
         {activeTab === 'about' && renderAbout()}
       </main>
 
-      <footer className="bg-slate-50 text-primary pt-12 md:pt-32 pb-28 md:pb-16 px-6 md:px-8 rounded-t-3xl md:rounded-t-[6rem] mt-20 md:mt-40 border-t border-slate-100">
+      <footer className="bg-primary text-white pt-12 md:pt-20 pb-28 md:pb-16 px-6 md:px-8 mt-20 md:mt-40">
         <div className="max-w-7xl mx-auto space-y-10 md:space-y-0 md:grid md:grid-cols-12 md:gap-16">
            <div className="md:col-span-5 space-y-5 md:space-y-10">
              <div className="flex items-center gap-2.5 md:gap-3 font-extrabold text-2xl md:text-4xl tracking-tighter cursor-pointer">
-                <div className="w-10 h-10 md:w-14 md:h-14 bg-primary rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-lg text-sm md:text-base">
+                <div className="w-10 h-10 md:w-14 md:h-14 bg-white rounded-xl md:rounded-2xl flex items-center justify-center text-primary shadow-lg text-sm md:text-base">
                   <i className="fas fa-bolt"></i>
                 </div>
                 <span className="uppercase">SportSync</span>
              </div>
-             <p className="text-slate-400 text-sm md:text-2xl leading-relaxed font-bold tracking-tight max-w-sm uppercase">Redefining facility access with minimalist efficiency.</p>
+             <p className="text-white/80 text-sm md:text-2xl leading-relaxed font-bold tracking-tight max-w-sm uppercase">Redefining court access with minimalist efficiency.</p>
            </div>
            <div className="md:col-span-2 space-y-4 md:space-y-10">
-             <h4 className="font-black text-[9px] md:text-xs uppercase tracking-[0.5em] text-slate-300">Quick Links</h4>
+             <h4 className="font-black text-[9px] md:text-xs uppercase tracking-[0.5em] text-white/50">Quick Links</h4>
              <ul className="flex md:block gap-6 md:space-y-6 text-sm md:text-lg font-black uppercase">
-                <li><button onClick={() => {setActiveTab('home'); setBookingStep('details'); scrollToBrowse();}} className="hover:text-slate-500 transition">Arenas</button></li>
-                <li><button onClick={() => setActiveTab('community')} className="hover:text-slate-500 transition">Events</button></li>
-                <li><button onClick={() => setActiveTab('about')} className="hover:text-slate-500 transition">About Us</button></li>
+                <li><button onClick={() => {setActiveTab('home'); setBookingStep('details'); scrollToBrowse();}} className="text-white/90 hover:text-white transition">Arenas</button></li>
+                <li><button onClick={() => setActiveTab('community')} className="text-white/90 hover:text-white transition">Events</button></li>
+                <li><button onClick={() => setActiveTab('about')} className="text-white/90 hover:text-white transition">About Us</button></li>
              </ul>
            </div>
            <div className="md:col-span-5 space-y-4 md:space-y-10">
-             <h4 className="font-black text-[9px] md:text-xs uppercase tracking-[0.5em] text-slate-300">Contact Us</h4>
+             <h4 className="font-black text-[9px] md:text-xs uppercase tracking-[0.5em] text-white/50">Contact Us</h4>
              <ul className="space-y-3 md:space-y-6">
                 <li className="flex items-start gap-3 md:gap-4">
-                  <i className="fas fa-map-marker-alt text-primary mt-0.5 md:mt-1 text-xs md:text-base"></i>
-                  <span className="text-slate-400 font-bold text-xs md:text-base">Forestview Village, Catalunan Grande, Davao City 8000</span>
+                  <i className="fas fa-map-marker-alt text-white/80 mt-0.5 md:mt-1 text-xs md:text-base"></i>
+                  <span className="text-white/80 font-bold text-xs md:text-base">Forestview Village, Catalunan Grande, Davao City 8000</span>
                 </li>
                 <li className="flex items-center gap-3 md:gap-4">
-                  <i className="fas fa-envelope text-primary text-xs md:text-base"></i>
-                  <a href="mailto:astnjt1@gmail.com" className="text-slate-400 font-bold hover:text-primary transition text-xs md:text-base">astnjt1@gmail.com</a>
+                  <i className="fas fa-envelope text-white/80 text-xs md:text-base"></i>
+                  <a href="mailto:astnjt1@gmail.com" className="text-white/80 font-bold hover:text-white transition text-xs md:text-base">astnjt1@gmail.com</a>
                 </li>
                 <li className="flex items-center gap-3 md:gap-4">
-                  <i className="fas fa-phone text-primary text-xs md:text-base"></i>
-                  <a href="tel:09760432250" className="text-slate-400 font-bold hover:text-primary transition text-xs md:text-base">0976 043 2250</a>
+                  <i className="fas fa-phone text-white/80 text-xs md:text-base"></i>
+                  <a href="tel:09760432250" className="text-white/80 font-bold hover:text-white transition text-xs md:text-base">0976 043 2250</a>
                 </li>
              </ul>
            </div>
@@ -1727,7 +1727,7 @@ const CourtCard: React.FC<{court: Court, onBook: () => void}> = ({ court, onBook
       </div>
       <div className="p-6 sm:p-8 space-y-4 flex-1 flex flex-col bg-white">
         <div className="flex justify-between items-start gap-3">
-          <h3 className="font-black text-xl text-primary group-hover:text-primary-light transition-colors line-clamp-2 leading-tight tracking-tighter uppercase">{court.name}</h3>
+          <h3 className="font-black text-2xl md:text-3xl text-primary group-hover:text-primary-light transition-colors line-clamp-2 leading-tight tracking-normal">{court.name}</h3>
           <div className="flex items-center text-primary text-[10px] font-black bg-primary-extralight px-2.5 py-1 rounded-lg border border-primary/10 shadow-sm flex-shrink-0">
             <i className="fas fa-star mr-1 text-primary"></i> {court.rating}
           </div>
