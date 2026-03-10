@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { GoogleGenAI } from "@google/genai";
 import { COURTS, COMMUNITY_EVENTS } from './constants';
 import { Court, SportType, CommunityEvent } from './types';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
@@ -20,96 +19,6 @@ const MapSkeleton = () => (
 );
 
 // SportSync Bot - AI Assistant
-const SportBot = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<{role: 'user' | 'bot', text: string}[]>([
-    { role: 'bot', text: "Hello! I'm your SportSync Assistant. How can I help you find a court today?" }
-  ]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages]);
-
-  const handleSend = async () => {
-    if (!input.trim()) return;
-    const userMsg = input;
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    setIsLoading(true);
-
-    try {
-      const ai = new GoogleGenAI({ apiKey: (process.env as any).API_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: `You are SportSync Bot. 
-        Context: Professional court booking for Badminton, Pickleball, and Basketball.
-        Visuals: Modern minimalist White and Gray.
-        User: ${userMsg}`,
-        config: {
-          systemInstruction: "Be professional, concise, and helpful. Your aesthetic is high-end minimalism. Use neutral tones in your descriptions."
-        }
-      });
-      setMessages(prev => [...prev, { role: 'bot', text: response.text || "Connection error. Please try again." }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'bot', text: "I'm currently offline. Please use our manual booking below." }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed bottom-8 right-8 z-50">
-      {isOpen ? (
-        <div className="w-80 md:w-96 h-[520px] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 animate-in fade-in slide-in-from-bottom-6 duration-300">
-          <div className="bg-primary p-5 text-white flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-white">
-                <i className="fas fa-robot text-sm"></i>
-              </div>
-              <span className="font-bold tracking-tight">Assistant</span>
-            </div>
-            <button onClick={() => setIsOpen(false)} className="hover:rotate-90 transition-transform"><i className="fas fa-times"></i></button>
-          </div>
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50">
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-4 rounded-2xl text-sm shadow-sm ${m.role === 'user' ? 'bg-primary text-white' : 'bg-white text-slate-800 border border-slate-100'}`}>
-                  {m.text}
-                </div>
-              </div>
-            ))}
-            {isLoading && <div className="text-slate-400 text-xs italic animate-pulse px-2">Assistant is typing...</div>}
-          </div>
-          <div className="p-4 bg-white border-t border-slate-100 flex gap-2">
-            <input 
-              className="flex-1 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary transition-colors text-slate-900"
-              placeholder="Type a message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            />
-            <button 
-              onClick={handleSend}
-              className="bg-primary text-white w-11 h-11 rounded-xl flex items-center justify-center hover:bg-black transition-all active:scale-95"
-            >
-              <i className="fas fa-paper-plane"></i>
-            </button>
-          </div>
-        </div>
-      ) : (
-        <button 
-          onClick={() => setIsOpen(true)}
-          className="w-16 h-16 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all active:scale-95 border-2 border-white shadow-slate-400/20"
-        >
-          <i className="fas fa-comment-alt text-2xl"></i>
-        </button>
-      )}
-    </div>
-  );
-};
 
 const Logo = () => (
   <div className="flex items-center gap-3 font-black text-2xl tracking-tighter cursor-pointer group">
@@ -574,30 +483,30 @@ const App: React.FC = () => {
 
     if (bookingStep === 'details') {
       return (
-        <div className="max-w-6xl mx-auto animate-in fade-in zoom-in-95 duration-500 space-y-8 pb-20">
-          <button onClick={() => setActiveTab('home')} className="group flex items-center text-slate-400 hover:text-primary font-black transition-colors uppercase text-xs tracking-widest">
-            <i className="fas fa-arrow-left mr-3 group-hover:-translate-x-2 transition-transform"></i> Back to Listing
+        <div className="max-w-6xl mx-auto animate-in fade-in zoom-in-95 duration-500 space-y-6 md:space-y-8 pb-20 px-1 md:px-0">
+          <button onClick={() => setActiveTab('home')} className="group flex items-center text-slate-400 hover:text-primary font-black transition-colors uppercase text-[10px] md:text-xs tracking-widest">
+            <i className="fas fa-arrow-left mr-2 md:mr-3 group-hover:-translate-x-2 transition-transform"></i> Back to Listing
           </button>
 
           <div className="bg-white rounded-2xl md:rounded-[4rem] shadow-2xl overflow-hidden border border-slate-100">
-            <div className="p-6 md:p-16 space-y-8 md:space-y-10">
-              <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-                <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <span className="px-5 py-2 bg-slate-100 text-primary font-black rounded-xl text-[10px] uppercase tracking-[0.2em] border border-slate-200">{selectedCourt.type}</span>
-                    <div className="flex items-center text-primary text-xs font-black bg-slate-50 px-3 rounded-xl border border-slate-100">
-                      <i className="fas fa-star mr-2"></i> {selectedCourt.rating}
+            <div className="p-5 md:p-16 space-y-6 md:space-y-10">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-5 md:gap-8">
+                <div className="space-y-3 md:space-y-4">
+                  <div className="flex gap-2 md:gap-3">
+                    <span className="px-3 md:px-5 py-1.5 md:py-2 bg-slate-100 text-primary font-black rounded-lg md:rounded-xl text-[9px] md:text-[10px] uppercase tracking-[0.2em] border border-slate-200">{selectedCourt.type}</span>
+                    <div className="flex items-center text-primary text-[10px] md:text-xs font-black bg-slate-50 px-2.5 md:px-3 rounded-lg md:rounded-xl border border-slate-100">
+                      <i className="fas fa-star mr-1.5 md:mr-2"></i> {selectedCourt.rating}
                     </div>
                   </div>
-                  <h2 className="text-3xl md:text-5xl font-black text-primary leading-tight tracking-tighter uppercase">{selectedCourt.name}</h2>
-                  <p className="text-slate-500 flex items-center font-bold text-lg"><i className="fas fa-map-pin mr-3 text-primary"></i>{selectedCourt.location}</p>
+                  <h2 className="text-2xl md:text-5xl font-black text-primary leading-tight tracking-tight">{selectedCourt.name}</h2>
+                  <p className="text-slate-500 flex items-start font-bold text-xs md:text-lg"><i className="fas fa-map-pin mr-2 md:mr-3 text-primary mt-0.5 md:mt-1"></i>{selectedCourt.location}</p>
                 </div>
-                <div className="text-center md:text-right space-y-4">
-                  <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">Starting from</p>
-                  <p className="text-4xl md:text-6xl font-black text-primary tracking-tighter">₱{selectedCourt.price}<span className="text-lg md:text-xl text-slate-300 font-bold ml-2 tracking-normal">/hr</span></p>
-                  <button 
+                <div className="w-full md:w-auto text-left md:text-right space-y-2 md:space-y-4">
+                  <p className="text-slate-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">Starting from</p>
+                  <p className="text-3xl md:text-6xl font-black text-primary tracking-tighter">₱{selectedCourt.price}<span className="text-sm md:text-xl text-slate-300 font-bold ml-1.5 md:ml-2 tracking-normal">/hr</span></p>
+                  <button
                     onClick={() => setBookingStep('calendar')}
-                    className="w-full bg-primary text-white px-12 py-6 rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl text-lg uppercase tracking-widest active:scale-95 mt-4"
+                    className="w-full bg-primary text-white px-8 md:px-12 py-4 md:py-6 rounded-xl md:rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl text-sm md:text-lg uppercase tracking-widest active:scale-95 mt-2 md:mt-4"
                   >
                     Book Now
                   </button>
@@ -605,8 +514,8 @@ const App: React.FC = () => {
               </div>
 
               {/* Sub-Tabs: Map, Photos, Pricing, Availability */}
-              <div className="border-t border-slate-100 pt-10">
-                <div className="flex flex-wrap gap-4 mb-8">
+              <div className="border-t border-slate-100 pt-6 md:pt-10">
+                <div className="flex gap-2 md:gap-4 mb-6 md:mb-8 overflow-x-auto pb-1">
                   {[
                     { id: 'photos', label: 'Gallery', icon: 'fa-images' },
                     { id: 'map', label: 'Location', icon: 'fa-map-marked-alt' },
@@ -615,22 +524,22 @@ const App: React.FC = () => {
                     <button
                       key={tab.id}
                       onClick={() => setDetailSubTab(tab.id as any)}
-                      className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${detailSubTab === tab.id ? 'bg-primary text-white shadow-xl' : 'bg-slate-50 text-slate-400 hover:text-primary'}`}
+                      className={`flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all whitespace-nowrap ${detailSubTab === tab.id ? 'bg-primary text-white shadow-xl' : 'bg-slate-50 text-slate-400 hover:text-primary'}`}
                     >
                       <i className={`fas ${tab.icon}`}></i> {tab.label}
                     </button>
                   ))}
                 </div>
 
-                <div className="bg-slate-50 rounded-[3rem] p-8 min-h-[400px] border border-slate-100 relative overflow-hidden">
+                <div className="bg-slate-50 rounded-2xl md:rounded-[3rem] p-4 md:p-8 min-h-[250px] md:min-h-[400px] border border-slate-100 relative overflow-hidden">
                   {detailSubTab === 'photos' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
-                      <img src={selectedCourt.image} className="w-full h-full object-cover rounded-3xl" alt="Main" />
-                      <div className="grid grid-cols-2 gap-4">
-                         <img src={`https://picsum.photos/seed/${selectedCourt.id}1/800/600`} className="w-full h-48 object-cover rounded-2xl grayscale" alt="Gallery 1" />
-                         <img src={`https://picsum.photos/seed/${selectedCourt.id}2/800/600`} className="w-full h-48 object-cover rounded-2xl grayscale" alt="Gallery 2" />
-                         <img src={`https://picsum.photos/seed/${selectedCourt.id}3/800/600`} className="w-full h-48 object-cover rounded-2xl grayscale" alt="Gallery 3" />
-                         <div className="w-full h-48 bg-primary rounded-2xl flex items-center justify-center text-white font-black text-xl">+12</div>
+                    <div className="grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-4 h-full">
+                      <img src={selectedCourt.image} className="w-full h-40 md:h-full object-cover rounded-xl md:rounded-3xl col-span-2 md:col-span-1" alt="Main" />
+                      <div className="grid grid-cols-2 gap-2 md:gap-4 col-span-2 md:col-span-1">
+                         <img src={`https://picsum.photos/seed/${selectedCourt.id}1/800/600`} className="w-full h-24 md:h-48 object-cover rounded-xl md:rounded-2xl grayscale" alt="Gallery 1" />
+                         <img src={`https://picsum.photos/seed/${selectedCourt.id}2/800/600`} className="w-full h-24 md:h-48 object-cover rounded-xl md:rounded-2xl grayscale" alt="Gallery 2" />
+                         <img src={`https://picsum.photos/seed/${selectedCourt.id}3/800/600`} className="w-full h-24 md:h-48 object-cover rounded-xl md:rounded-2xl grayscale" alt="Gallery 3" />
+                         <div className="w-full h-24 md:h-48 bg-primary rounded-xl md:rounded-2xl flex items-center justify-center text-white font-black text-base md:text-xl">+12</div>
                       </div>
                     </div>
                   )}
@@ -640,18 +549,18 @@ const App: React.FC = () => {
                     </Suspense>
                   )}
                   {detailSubTab === 'pricing' && (
-                    <div className="space-y-8 p-4">
-                       <h3 className="text-3xl font-black text-primary uppercase tracking-tighter">Membership Rates</h3>
-                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-6 md:space-y-8 p-1 md:p-4">
+                       <h3 className="text-xl md:text-3xl font-black text-primary uppercase tracking-tighter">Membership Rates</h3>
+                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
                          {[
                            { name: 'Standard', price: selectedCourt.price, desc: 'Per hour, no commitment' },
                            { name: 'Club Member', price: Math.floor(selectedCourt.price * 0.8), desc: '20% off all bookings' },
                            { name: 'Elite Pass', price: 99, desc: 'Unlimited access monthly' }
                          ].map(p => (
-                           <div key={p.name} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:border-primary transition-all group">
-                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{p.name}</p>
-                             <p className="text-4xl font-black text-primary tracking-tighter">₱{p.price}<span className="text-xs text-slate-300">/hr</span></p>
-                             <p className="text-sm text-slate-400 mt-4 font-medium">{p.desc}</p>
+                           <div key={p.name} className="bg-white p-5 md:p-8 rounded-2xl md:rounded-3xl border border-slate-100 shadow-sm hover:border-primary transition-all group">
+                             <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 md:mb-2">{p.name}</p>
+                             <p className="text-2xl md:text-4xl font-black text-primary tracking-tighter">₱{p.price}<span className="text-[10px] md:text-xs text-slate-300">/hr</span></p>
+                             <p className="text-xs md:text-sm text-slate-400 mt-2 md:mt-4 font-medium">{p.desc}</p>
                            </div>
                          ))}
                        </div>
@@ -1687,7 +1596,6 @@ Phone: ${postEventData.contactPhone || 'N/A'}
         </div>
       </footer>
 
-      <SportBot />
 
       {/* Mobile Bottom Nav */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 flex md:hidden justify-around py-2 px-2">
@@ -1727,7 +1635,7 @@ const CourtCard: React.FC<{court: Court, onBook: () => void}> = ({ court, onBook
       </div>
       <div className="p-6 sm:p-8 space-y-4 flex-1 flex flex-col bg-white">
         <div className="flex justify-between items-start gap-3">
-          <h3 className="font-black text-2xl md:text-3xl text-primary group-hover:text-primary-light transition-colors line-clamp-2 leading-tight tracking-normal">{court.name}</h3>
+          <h3 className="font-black text-2xl md:text-3xl text-primary group-hover:text-primary-light transition-colors line-clamp-2 leading-tight tracking-tight">{court.name}</h3>
           <div className="flex items-center text-primary text-[10px] font-black bg-primary-extralight px-2.5 py-1 rounded-lg border border-primary/10 shadow-sm flex-shrink-0">
             <i className="fas fa-star mr-1 text-primary"></i> {court.rating}
           </div>
