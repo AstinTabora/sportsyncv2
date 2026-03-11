@@ -322,17 +322,17 @@ const App: React.FC = () => {
   );
 
   const renderAbout = () => (
-    <div className="space-y-16 md:space-y-32 animate-in fade-in duration-1000 pb-20">
+    <div className="space-y-10 md:space-y-32 animate-in fade-in duration-1000 pb-20">
       {/* Slide 1: Title Slide */}
-      <section className="text-center py-12 md:py-24 space-y-8 md:space-y-10">
-        <div className="w-24 h-24 bg-primary text-white rounded-3xl flex items-center justify-center mx-auto shadow-2xl mb-8">
-          <i className="fas fa-bolt text-4xl"></i>
+      <section className="text-center py-8 md:py-24 space-y-5 md:space-y-10">
+        <div className="w-14 h-14 md:w-24 md:h-24 bg-primary text-white rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-2xl mb-4 md:mb-8">
+          <i className="fas fa-bolt text-xl md:text-4xl"></i>
         </div>
-        <div className="space-y-4">
-          <h1 className="text-5xl md:text-8xl font-black text-primary tracking-tighter uppercase">SportSync</h1>
-          <p className="text-slate-400 text-lg md:text-3xl font-black uppercase tracking-[0.1em] md:tracking-[0.2em]">Seamless Booking for Active Lifestyles</p>
+        <div className="space-y-2 md:space-y-4">
+          <h1 className="text-3xl md:text-8xl font-black text-primary tracking-tighter uppercase">SportSync</h1>
+          <p className="text-slate-400 text-xs md:text-3xl font-black uppercase tracking-[0.1em] md:tracking-[0.2em]">Seamless Booking for Active Lifestyles</p>
         </div>
-        <div className="flex justify-center gap-12 pt-10 text-slate-300 font-black text-xs uppercase tracking-[0.4em]">
+        <div className="flex justify-center gap-6 md:gap-12 pt-4 md:pt-10 text-slate-300 font-black text-[9px] md:text-xs uppercase tracking-[0.3em] md:tracking-[0.4em]">
            <span>Team Venture</span>
            <span className="text-primary">•</span>
            <span>EST. 2026</span>
@@ -340,160 +340,160 @@ const App: React.FC = () => {
       </section>
 
       {/* Slide 2: The Problem & Solution */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div className="bg-slate-50 p-8 md:p-16 rounded-2xl md:rounded-[4rem] border border-slate-100 space-y-6 md:space-y-8">
-          <div className="flex flex-col gap-2">
-            <span className="bg-primary text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest self-start">The Problem</span>
-            <h2 className="text-3xl md:text-5xl font-black text-primary uppercase tracking-tighter">Friction in Play</h2>
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-12">
+        <div className="bg-slate-50 p-5 md:p-16 rounded-2xl md:rounded-[4rem] border border-slate-100 space-y-3 md:space-y-8">
+          <div className="flex flex-col gap-1.5 md:gap-2">
+            <span className="bg-primary text-white px-3 md:px-4 py-1.5 md:py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest self-start">The Problem</span>
+            <h2 className="text-xl md:text-5xl font-black text-primary uppercase tracking-tighter">Friction in Play</h2>
           </div>
-          <p className="text-slate-500 text-xl font-medium leading-relaxed">
+          <p className="text-slate-500 text-sm md:text-xl font-medium leading-relaxed">
             Booking local courts (Badminton, Pickleball, Basketball) is tedious. Relies on outdated Facebook searches, endless manual calls, and insecure bank transfers.
           </p>
-          <div className="w-12 h-1 bg-primary/20 rounded-full"></div>
+          <div className="w-8 md:w-12 h-1 bg-primary/20 rounded-full"></div>
         </div>
-        <div className="bg-white p-8 md:p-16 rounded-2xl md:rounded-[4rem] border-4 border-primary space-y-6 md:space-y-8 shadow-2xl">
-          <div className="flex flex-col gap-2">
-            <span className="bg-primary text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest self-start">The Solution</span>
-            <h2 className="text-3xl md:text-5xl font-black text-primary uppercase tracking-tighter">Centralized Flow</h2>
+        <div className="bg-white p-5 md:p-16 rounded-2xl md:rounded-[4rem] border-2 md:border-4 border-primary space-y-3 md:space-y-8 shadow-xl md:shadow-2xl">
+          <div className="flex flex-col gap-1.5 md:gap-2">
+            <span className="bg-primary text-white px-3 md:px-4 py-1.5 md:py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest self-start">The Solution</span>
+            <h2 className="text-xl md:text-5xl font-black text-primary uppercase tracking-tighter">Centralized Flow</h2>
           </div>
-          <p className="text-slate-500 text-xl font-medium leading-relaxed">
+          <p className="text-slate-500 text-sm md:text-xl font-medium leading-relaxed">
             A centralized web platform for instant, real-time booking. Connecting athletes with facility owners seamlessly without the administrative headache.
           </p>
-          <div className="w-12 h-1 bg-primary rounded-full"></div>
+          <div className="w-8 md:w-12 h-1 bg-primary rounded-full"></div>
         </div>
       </section>
 
       {/* Slide 3: Team Setup */}
-      <section className="space-y-12">
-        <div className="text-center space-y-4">
-          <h2 className="text-5xl font-black text-primary uppercase tracking-tighter">Team Venture</h2>
-          <p className="text-slate-400 font-bold">Ensuring a smooth experience from login to checkout.</p>
+      <section className="space-y-6 md:space-y-12">
+        <div className="text-center space-y-2 md:space-y-4">
+          <h2 className="text-2xl md:text-5xl font-black text-primary uppercase tracking-tighter">Team Venture</h2>
+          <p className="text-slate-400 font-bold text-xs md:text-base">Ensuring a smooth experience from login to checkout.</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-           <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm flex items-center gap-8 group hover:border-primary transition-all">
-              <div className="w-20 h-20 bg-slate-50 rounded-[1.5rem] flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                <i className="fas fa-user-ninja text-3xl"></i>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-8 max-w-4xl mx-auto">
+           <div className="bg-white p-4 md:p-10 rounded-2xl md:rounded-[3rem] border border-slate-100 shadow-sm flex items-center gap-4 md:gap-8 group hover:border-primary transition-all">
+              <div className="w-12 h-12 md:w-20 md:h-20 bg-slate-50 rounded-xl md:rounded-[1.5rem] flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all flex-shrink-0">
+                <i className="fas fa-user-ninja text-lg md:text-3xl"></i>
               </div>
               <div>
-                <h3 className="text-2xl font-black text-primary uppercase">Astin Tabora</h3>
-                <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mt-1">Frontend & Design Lead</p>
+                <h3 className="text-base md:text-2xl font-black text-primary uppercase">Astin Tabora</h3>
+                <p className="text-slate-400 font-bold uppercase text-[9px] md:text-[10px] tracking-widest mt-0.5 md:mt-1">Frontend & Design Lead</p>
               </div>
            </div>
-           <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm flex items-center gap-8 group hover:border-primary transition-all">
-              <div className="w-20 h-20 bg-slate-50 rounded-[1.5rem] flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                <i className="fas fa-database text-3xl"></i>
+           <div className="bg-white p-4 md:p-10 rounded-2xl md:rounded-[3rem] border border-slate-100 shadow-sm flex items-center gap-4 md:gap-8 group hover:border-primary transition-all">
+              <div className="w-12 h-12 md:w-20 md:h-20 bg-slate-50 rounded-xl md:rounded-[1.5rem] flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all flex-shrink-0">
+                <i className="fas fa-database text-lg md:text-3xl"></i>
               </div>
               <div>
-                <h3 className="text-2xl font-black text-primary uppercase">Matthew Jariol</h3>
-                <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mt-1">Backend & Systems Architect</p>
+                <h3 className="text-base md:text-2xl font-black text-primary uppercase">Matthew Jariol</h3>
+                <p className="text-slate-400 font-bold uppercase text-[9px] md:text-[10px] tracking-widest mt-0.5 md:mt-1">Backend & Systems Architect</p>
               </div>
            </div>
         </div>
       </section>
 
       {/* Slide 4: AI Integration & SDG */}
-      <section className="bg-primary p-8 md:p-20 rounded-2xl md:rounded-[5rem] text-white relative overflow-hidden border border-primary-dark shadow-2xl">
+      <section className="bg-primary p-5 md:p-20 rounded-2xl md:rounded-[5rem] text-white relative overflow-hidden border border-primary-dark shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-[120px]"></div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <div className="space-y-10">
-            <div className="space-y-4">
-              <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">AI Powered<br/>Design.</h2>
-              <p className="text-white/80 text-xl font-medium">Utilizing Gemini AI to refine code, improve workflow efficiency, and ensure clean final output.</p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-20 items-center">
+          <div className="space-y-6 md:space-y-10">
+            <div className="space-y-2 md:space-y-4">
+              <h2 className="text-2xl md:text-6xl font-black uppercase tracking-tighter leading-none">AI Powered<br/>Design.</h2>
+              <p className="text-white/80 text-sm md:text-xl font-medium">Utilizing Gemini AI to refine code, improve workflow efficiency, and ensure clean final output.</p>
             </div>
-            <div className="flex gap-12 pt-4">
-              <div className="space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Refinement</p>
-                <div className="flex gap-2">
-                  <div className="w-8 h-2 bg-white rounded-full"></div>
-                  <div className="w-8 h-2 bg-white/20 rounded-full"></div>
+            <div className="flex gap-8 md:gap-12 pt-2 md:pt-4">
+              <div className="space-y-1.5 md:space-y-2">
+                <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Refinement</p>
+                <div className="flex gap-1.5 md:gap-2">
+                  <div className="w-6 md:w-8 h-1.5 md:h-2 bg-white rounded-full"></div>
+                  <div className="w-6 md:w-8 h-1.5 md:h-2 bg-white/20 rounded-full"></div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Efficiency</p>
-                <div className="flex gap-2">
-                  <div className="w-8 h-2 bg-white rounded-full"></div>
-                  <div className="w-8 h-2 bg-white rounded-full"></div>
+              <div className="space-y-1.5 md:space-y-2">
+                <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Efficiency</p>
+                <div className="flex gap-1.5 md:gap-2">
+                  <div className="w-6 md:w-8 h-1.5 md:h-2 bg-white rounded-full"></div>
+                  <div className="w-6 md:w-8 h-1.5 md:h-2 bg-white rounded-full"></div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="bg-white/10 backdrop-blur-3xl p-8 md:p-16 rounded-2xl md:rounded-[4rem] border border-white/20 space-y-6 md:space-y-8">
-            <div className="w-20 h-20 bg-white text-primary rounded-[2rem] flex items-center justify-center shadow-2xl">
-              <i className="fas fa-heartbeat text-3xl"></i>
+          <div className="bg-white/10 backdrop-blur-3xl p-5 md:p-16 rounded-2xl md:rounded-[4rem] border border-white/20 space-y-4 md:space-y-8">
+            <div className="w-14 h-14 md:w-20 md:h-20 bg-white text-primary rounded-xl md:rounded-[2rem] flex items-center justify-center shadow-2xl">
+              <i className="fas fa-heartbeat text-xl md:text-3xl"></i>
             </div>
-            <h3 className="text-2xl md:text-4xl font-black uppercase tracking-tighter">SDG Goal #3</h3>
-            <p className="text-white/80 text-lg font-medium">Good Health and Well-being. Encouraging physical activity by removing booking friction across local communities.</p>
+            <h3 className="text-lg md:text-4xl font-black uppercase tracking-tighter">SDG Goal #3</h3>
+            <p className="text-white/80 text-sm md:text-lg font-medium">Good Health and Well-being. Encouraging physical activity by removing booking friction across local communities.</p>
           </div>
         </div>
       </section>
 
       {/* Slide 5: Market & Users */}
-      <section className="space-y-16">
-        <div className="text-center space-y-4 max-w-2xl mx-auto">
-          <h2 className="text-5xl font-black text-primary uppercase tracking-tighter">Market & Personas.</h2>
-          <p className="text-slate-400 font-bold">Rising popularity of modern sports vs. outdated pen-and-paper scheduling.</p>
+      <section className="space-y-8 md:space-y-16">
+        <div className="text-center space-y-2 md:space-y-4 max-w-2xl mx-auto">
+          <h2 className="text-2xl md:text-5xl font-black text-primary uppercase tracking-tighter">Market & Personas.</h2>
+          <p className="text-slate-400 font-bold text-xs md:text-base">Rising popularity of modern sports vs. outdated pen-and-paper scheduling.</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-           <div className="space-y-6">
-              <div className="flex items-center gap-6">
-                <div className="w-16 h-16 bg-primary-extralight rounded-2xl flex items-center justify-center border border-primary/10 text-primary">
-                   <i className="fas fa-users text-2xl"></i>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+           <div className="space-y-3 md:space-y-6">
+              <div className="flex items-center gap-3 md:gap-6">
+                <div className="w-10 h-10 md:w-16 md:h-16 bg-primary-extralight rounded-xl md:rounded-2xl flex items-center justify-center border border-primary/10 text-primary flex-shrink-0">
+                   <i className="fas fa-users text-base md:text-2xl"></i>
                 </div>
-                <h4 className="text-2xl font-black text-primary uppercase">The Players</h4>
+                <h4 className="text-base md:text-2xl font-black text-primary uppercase">The Players</h4>
               </div>
-              <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm">
-                <p className="text-primary font-black uppercase text-xs mb-2 tracking-widest">Persona: Student Alex</p>
-                <p className="text-slate-500 font-medium leading-relaxed">Hobbyist athlete looking for quick pickup games between classes. Values speed and mobile access.</p>
+              <div className="bg-white p-5 md:p-10 rounded-2xl md:rounded-[3rem] border border-slate-100 shadow-sm">
+                <p className="text-primary font-black uppercase text-[10px] md:text-xs mb-1 md:mb-2 tracking-widest">Persona: Student Alex</p>
+                <p className="text-slate-500 font-medium leading-relaxed text-xs md:text-base">Hobbyist athlete looking for quick pickup games between classes. Values speed and mobile access.</p>
               </div>
            </div>
-           <div className="space-y-6">
-              <div className="flex items-center gap-6">
-                <div className="w-16 h-16 bg-primary-extralight rounded-2xl flex items-center justify-center border border-primary/10 text-primary">
-                   <i className="fas fa-store text-2xl"></i>
+           <div className="space-y-3 md:space-y-6">
+              <div className="flex items-center gap-3 md:gap-6">
+                <div className="w-10 h-10 md:w-16 md:h-16 bg-primary-extralight rounded-xl md:rounded-2xl flex items-center justify-center border border-primary/10 text-primary flex-shrink-0">
+                   <i className="fas fa-store text-base md:text-2xl"></i>
                 </div>
-                <h4 className="text-2xl font-black text-primary uppercase">The Owners</h4>
+                <h4 className="text-base md:text-2xl font-black text-primary uppercase">The Owners</h4>
               </div>
-              <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm">
-                <p className="text-primary font-black uppercase text-xs mb-2 tracking-widest">Persona: Manager Mike</p>
-                <p className="text-slate-500 font-medium leading-relaxed">Local business owner needing streamlined schedule management. Values reliability and payment security.</p>
+              <div className="bg-white p-5 md:p-10 rounded-2xl md:rounded-[3rem] border border-slate-100 shadow-sm">
+                <p className="text-primary font-black uppercase text-[10px] md:text-xs mb-1 md:mb-2 tracking-widest">Persona: Manager Mike</p>
+                <p className="text-slate-500 font-medium leading-relaxed text-xs md:text-base">Local business owner needing streamlined schedule management. Values reliability and payment security.</p>
               </div>
            </div>
         </div>
       </section>
 
       {/* Slide 6: Key Features */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-8">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
         {[
           { label: 'Calendar', icon: 'fa-calendar-check', desc: 'Real-time sync' },
           { label: 'Maps', icon: 'fa-location-arrow', desc: 'Geo-integration' },
           { label: 'Payments', icon: 'fa-shield-halved', desc: 'Secure checkout' },
           { label: 'Community', icon: 'fa-trophy', desc: 'Tournament brackets' }
         ].map(f => (
-          <div key={f.label} className="text-center space-y-4 md:space-y-6 p-4 md:p-8 bg-white border border-slate-100 rounded-2xl md:rounded-[3rem] shadow-sm hover:shadow-xl transition-all group">
-             <div className="w-14 h-14 md:w-20 md:h-20 bg-slate-50 rounded-xl md:rounded-[1.5rem] mx-auto flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-inner">
-               <i className={`fas ${f.icon} text-xl md:text-3xl`}></i>
+          <div key={f.label} className="text-center space-y-2 md:space-y-6 p-3 md:p-8 bg-white border border-slate-100 rounded-xl md:rounded-[3rem] shadow-sm hover:shadow-xl transition-all group">
+             <div className="w-10 h-10 md:w-20 md:h-20 bg-slate-50 rounded-lg md:rounded-[1.5rem] mx-auto flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-inner">
+               <i className={`fas ${f.icon} text-base md:text-3xl`}></i>
              </div>
-             <div className="space-y-2">
-               <h5 className="font-black text-lg uppercase text-primary">{f.label}</h5>
-               <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">{f.desc}</p>
+             <div className="space-y-1 md:space-y-2">
+               <h5 className="font-black text-xs md:text-lg uppercase text-primary">{f.label}</h5>
+               <p className="text-[8px] md:text-[10px] font-black uppercase text-slate-300 tracking-widest">{f.desc}</p>
              </div>
           </div>
         ))}
       </section>
 
       {/* Slide 7: Roadmap & Goals */}
-      <section className="bg-slate-50 p-6 md:p-20 rounded-2xl md:rounded-[5rem] border border-slate-100 space-y-10 md:space-y-16">
-        <div className="flex flex-col lg:flex-row justify-between items-center gap-12">
-          <div className="space-y-4">
-             <h2 className="text-4xl md:text-6xl font-black text-primary uppercase tracking-tighter leading-none">Strategic<br/>Growth.</h2>
-             <p className="text-slate-400 font-bold text-xl uppercase tracking-widest">Target: Digitize 50% of local courts.</p>
+      <section className="bg-slate-50 p-5 md:p-20 rounded-2xl md:rounded-[5rem] border border-slate-100 space-y-6 md:space-y-16">
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-6 md:gap-12">
+          <div className="space-y-2 md:space-y-4 text-center lg:text-left">
+             <h2 className="text-2xl md:text-6xl font-black text-primary uppercase tracking-tighter leading-none">Strategic<br/>Growth.</h2>
+             <p className="text-slate-400 font-bold text-xs md:text-xl uppercase tracking-widest">Target: Digitize 50% of local courts.</p>
           </div>
-          <div className="bg-white p-8 md:p-12 rounded-2xl md:rounded-[4rem] border border-slate-200 shadow-sm flex-1 max-w-xl">
-             <h4 className="text-primary font-black uppercase text-xs tracking-[0.4em] mb-10">Release Criteria</h4>
-             <ul className="space-y-6 font-black text-primary uppercase text-sm tracking-tighter">
-                <li className="flex items-center gap-4"><i className="fas fa-circle-check text-emerald-500"></i> Seamless Search-to-Booking Flow</li>
-                <li className="flex items-center gap-4"><i className="fas fa-circle-check text-emerald-500"></i> Confirmation Email &lt; 2 Minutes</li>
-                <li className="flex items-center gap-4"><i className="fas fa-circle-check text-emerald-500"></i> Zero-Error Checkout Rate</li>
+          <div className="bg-white p-5 md:p-12 rounded-2xl md:rounded-[4rem] border border-slate-200 shadow-sm flex-1 max-w-xl w-full">
+             <h4 className="text-primary font-black uppercase text-[10px] md:text-xs tracking-[0.3em] md:tracking-[0.4em] mb-5 md:mb-10">Release Criteria</h4>
+             <ul className="space-y-3 md:space-y-6 font-black text-primary uppercase text-xs md:text-sm tracking-tighter">
+                <li className="flex items-center gap-3 md:gap-4"><i className="fas fa-circle-check text-emerald-500"></i> Seamless Search-to-Booking Flow</li>
+                <li className="flex items-center gap-3 md:gap-4"><i className="fas fa-circle-check text-emerald-500"></i> Confirmation Email &lt; 2 Minutes</li>
+                <li className="flex items-center gap-3 md:gap-4"><i className="fas fa-circle-check text-emerald-500"></i> Zero-Error Checkout Rate</li>
              </ul>
           </div>
         </div>
