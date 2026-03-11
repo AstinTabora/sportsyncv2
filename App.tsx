@@ -50,7 +50,7 @@ const App: React.FC = () => {
   const [eventRegistrationStep, setEventRegistrationStep] = useState<'details' | 'form' | 'success'>('details');
   const [selectedSlots, setSelectedSlots] = useState<{court: string, time: string}[]>([]);
   const [bookingStep, setBookingStep] = useState<'details' | 'calendar' | 'payment' | 'success' | 'confirmation'>('details');
-  const [detailSubTab, setDetailSubTab] = useState<'map' | 'photos' | 'pricing' | 'availability'>('photos');
+  const [detailSubTab, setDetailSubTab] = useState<'map' | 'photos' | 'pricing' | 'availability'>('map');
   
   // Google Calendar Auth State
   const [isGoogleAuthenticated, setIsGoogleAuthenticated] = useState(false);
@@ -540,8 +540,8 @@ const App: React.FC = () => {
               <div className="border-t border-slate-100 pt-6 md:pt-10">
                 <div className="flex gap-2 md:gap-4 mb-6 md:mb-8 overflow-x-auto pb-1">
                   {[
-                    { id: 'photos', label: 'Gallery', icon: 'fa-images' },
                     { id: 'map', label: 'Location', icon: 'fa-map-marked-alt' },
+                    { id: 'photos', label: 'Gallery', icon: 'fa-images' },
                     { id: 'pricing', label: 'Pricing Info', icon: 'fa-tag' }
                   ].map(tab => (
                     <button
@@ -554,7 +554,7 @@ const App: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="bg-slate-50 rounded-2xl md:rounded-[3rem] p-4 md:p-8 min-h-[250px] md:min-h-[400px] border border-slate-100 relative overflow-hidden">
+                <div className={`bg-slate-50 rounded-2xl md:rounded-[3rem] min-h-[250px] md:min-h-[400px] border border-slate-100 relative overflow-hidden ${detailSubTab === 'map' ? 'p-0' : 'p-4 md:p-8'}`}>
                   {detailSubTab === 'photos' && (
                     <div className="grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-4 h-full">
                       <img src={selectedCourt.image} className="w-full h-40 md:h-full object-cover rounded-xl md:rounded-3xl col-span-2 md:col-span-1" alt="Main" />
@@ -1036,9 +1036,9 @@ const App: React.FC = () => {
           {/* User Details Modal (shared) */}
           {showUserFormModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-              <div className="bg-white rounded-[3rem] shadow-2xl p-10 max-w-md w-full border border-slate-100 animate-in zoom-in-95 duration-200">
-                <div className="text-center space-y-2 mb-8">
-                  <h3 className="text-3xl font-black text-primary tracking-tighter uppercase">Your Details</h3>
+              <div className="bg-white rounded-2xl md:rounded-[3rem] shadow-2xl p-6 md:p-10 max-w-md w-full border border-slate-100 animate-in zoom-in-95 duration-200">
+                <div className="text-center space-y-2 mb-6 md:mb-8">
+                  <h3 className="text-2xl md:text-3xl font-black text-primary tracking-tighter uppercase">Your Details</h3>
                   <p className="text-slate-500 font-medium text-sm">Please provide your information for the receipt.</p>
                 </div>
 
@@ -1191,19 +1191,19 @@ const App: React.FC = () => {
       const totalPrice = selectedSlots.length * (selectedCourt?.price || 0);
 
       return (
-        <div className="max-w-4xl mx-auto animate-in slide-in-from-bottom-12 duration-700 pb-20">
-           <div className="bg-white rounded-2xl md:rounded-[4rem] shadow-2xl p-6 md:p-12 lg:p-20 border border-slate-100 space-y-10 md:space-y-12">
-              <div className="flex justify-between items-start border-b border-slate-100 pb-10">
+        <div className="max-w-4xl mx-auto animate-in slide-in-from-bottom-12 duration-700 pb-20 px-1 md:px-0">
+           <div className="bg-white rounded-2xl md:rounded-[4rem] shadow-2xl p-5 md:p-12 lg:p-20 border border-slate-100 space-y-8 md:space-y-12">
+              <div className="flex justify-between items-start border-b border-slate-100 pb-6 md:pb-10">
                 <Logo />
                 <div className="text-right">
-                  <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">Reference Code</p>
-                  <p className="font-black text-primary text-xl">{bookingRefCode}</p>
+                  <p className="text-[9px] md:text-[10px] font-black uppercase text-slate-300 tracking-widest">Reference Code</p>
+                  <p className="font-black text-primary text-base md:text-xl">{bookingRefCode}</p>
                 </div>
               </div>
 
-              <div className="space-y-10">
+              <div className="space-y-8 md:space-y-10">
                 <div className="space-y-2">
-                  <h3 className="text-3xl md:text-4xl font-black text-primary tracking-tighter uppercase">
+                  <h3 className="text-2xl md:text-4xl font-black text-primary tracking-tighter uppercase">
                     {paymentMethod === 'cash' ? 'Reservation Confirmation.' : 'Booking Confirmation.'}
                   </h3>
                   <p className="text-slate-400 font-bold text-sm md:text-base">
@@ -1213,8 +1213,8 @@ const App: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 pt-4">
-                   <div className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 pt-4">
+                   <div className="space-y-5 md:space-y-8">
                       <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">Venue</p>
                         <p className="font-black text-primary text-lg">{selectedCourt.name}</p>
@@ -1230,10 +1230,10 @@ const App: React.FC = () => {
                         <p className="text-sm font-bold text-slate-400">{userPhone}</p>
                       </div>
                    </div>
-                   <div className="space-y-8">
+                   <div className="space-y-5 md:space-y-8">
                       <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">{paymentMethod === 'cash' ? 'Amount Due' : 'Amount Paid'}</p>
-                        <p className="font-black text-primary text-3xl">₱{totalPrice}.00</p>
+                        <p className="font-black text-primary text-2xl md:text-3xl">₱{totalPrice}.00</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">Payment Method</p>
@@ -1248,9 +1248,9 @@ const App: React.FC = () => {
                    </div>
                 </div>
 
-                <div className="pt-10 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
-                  <button onClick={() => window.print()} className="flex-1 py-5 rounded-2xl font-black border border-slate-200 text-primary uppercase text-xs tracking-widest hover:bg-slate-50 transition"><i className="fas fa-print mr-2"></i> Print Receipt</button>
-                  <button onClick={() => { setActiveTab('home'); setBookingStep('details'); setSelectedSlots([]); setPaymentMethod(null); setBookingRefCode(''); }} className="flex-1 py-5 rounded-2xl font-black bg-primary text-white shadow-xl uppercase text-xs tracking-widest hover:bg-slate-800 transition">Back to Home</button>
+                <div className="pt-6 md:pt-10 border-t border-slate-100 flex flex-col sm:flex-row gap-3 md:gap-4">
+                  <button onClick={() => window.print()} className="flex-1 py-3.5 md:py-5 rounded-xl md:rounded-2xl font-black border border-slate-200 text-primary uppercase text-[10px] md:text-xs tracking-widest hover:bg-slate-50 transition"><i className="fas fa-print mr-2"></i> Print Receipt</button>
+                  <button onClick={() => { setActiveTab('home'); setBookingStep('details'); setSelectedSlots([]); setPaymentMethod(null); setBookingRefCode(''); }} className="flex-1 py-3.5 md:py-5 rounded-xl md:rounded-2xl font-black bg-primary text-white shadow-xl uppercase text-[10px] md:text-xs tracking-widest hover:bg-slate-800 transition">Back to Home</button>
                 </div>
               </div>
            </div>
