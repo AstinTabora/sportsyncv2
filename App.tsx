@@ -31,9 +31,9 @@ const MapSkeleton = () => (
 // SportSync Bot - AI Assistant
 
 const Logo = () => (
-  <div className="flex items-center gap-3 font-black text-2xl tracking-tighter cursor-pointer group">
-    <div className="w-11 h-11 bg-primary rounded-xl flex items-center justify-center text-white group-hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
-      <i className="fas fa-bolt text-lg"></i>
+  <div className="flex items-center gap-2 md:gap-3 font-black text-lg md:text-2xl tracking-tighter cursor-pointer group">
+    <div className="w-8 h-8 md:w-11 md:h-11 bg-primary rounded-lg md:rounded-xl flex items-center justify-center text-white group-hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
+      <i className="fas fa-bolt text-xs md:text-lg"></i>
     </div>
     <span className="text-primary group-hover:text-primary-dark transition-colors uppercase font-black">SportSync</span>
   </div>
@@ -196,7 +196,7 @@ const App: React.FC = () => {
         <div className="relative z-10 max-w-4xl space-y-10 px-4">
           <div className="space-y-6">
             <h1 className="text-5xl md:text-9xl font-black text-white leading-[0.85] tracking-tighter uppercase">Plan Less <br/>Play More.</h1>
-            <p className="text-white/90 text-base md:text-xl font-medium max-w-xl mx-auto leading-relaxed tracking-wide">Book premium Badminton, Pickleball, and Basketball courts in a few clicks.</p>
+            <p className="text-white/90 text-xs md:text-xl font-medium max-w-xl mx-auto leading-snug md:leading-relaxed tracking-wide">Book premium Badminton, Pickleball, and Basketball courts in a few clicks.</p>
           </div>
           <div className="flex bg-white/10 backdrop-blur-md rounded-full p-1.5 md:p-3 shadow-2xl max-w-md md:max-w-xl mx-auto group focus-within:ring-4 focus-within:ring-white/20 transition-all border border-white/20">
             <input
@@ -228,12 +228,12 @@ const App: React.FC = () => {
           <div className="flex items-center justify-center relative z-10">
             {[
               { icon: 'fa-table-tennis-paddle-ball', title: 'Pick a Sport' },
-              { icon: 'fa-building', title: 'Choose a Court' },
-              { icon: 'fa-calendar-check', title: 'Book Your Slot' },
+              { icon: null, img: '/icons/court.png', title: 'Choose a Court' },
+              { icon: null, img: '/icons/appointment.png', title: 'Book Your Slot' },
             ].map((item, i) => (
               <div key={i} className="text-center space-y-5 px-8 lg:px-14">
                 <div className="flex items-center justify-center mx-auto">
-                  <i className={`fas ${item.icon} text-5xl lg:text-7xl text-primary`}></i>
+                  {item.img ? <img src={item.img} alt={item.title} className="h-12 lg:h-[4.5rem]" style={{filter: 'brightness(0) saturate(100%) invert(22%) sepia(95%) saturate(1200%) hue-rotate(100deg) brightness(0.85)'}} /> : <i className={`fas ${item.icon} text-5xl lg:text-7xl text-primary`}></i>}
                 </div>
                 <h3 className="font-black text-lg lg:text-2xl text-primary uppercase tracking-tight">{item.title}</h3>
               </div>
@@ -250,12 +250,12 @@ const App: React.FC = () => {
           <div className="flex items-center justify-center relative z-10">
             {[
               { icon: 'fa-table-tennis-paddle-ball', title: 'Pick a Sport' },
-              { icon: 'fa-building', title: 'Choose a Court' },
-              { icon: 'fa-calendar-check', title: 'Book Your Slot' },
+              { icon: null, img: '/icons/court.png', title: 'Choose a Court' },
+              { icon: null, img: '/icons/appointment.png', title: 'Book Your Slot' },
             ].map((item, i) => (
               <div key={i} className="text-center space-y-2.5 px-3 flex-1">
                 <div className="flex items-center justify-center mx-auto">
-                  <i className={`fas ${item.icon} text-3xl text-primary`}></i>
+                  {item.img ? <img src={item.img} alt={item.title} className="h-8" style={{filter: 'brightness(0) saturate(100%) invert(22%) sepia(95%) saturate(1200%) hue-rotate(100deg) brightness(0.85)'}} /> : <i className={`fas ${item.icon} text-3xl text-primary`}></i>}
                 </div>
                 <h3 className="font-black text-[10px] text-primary uppercase tracking-tight leading-tight">{item.title}</h3>
               </div>
@@ -1145,40 +1145,40 @@ const App: React.FC = () => {
 
     if (bookingStep === 'success') {
       return (
-        <div className="max-w-4xl mx-auto animate-in zoom-in duration-500 pb-20">
-          <div className="bg-white rounded-[5rem] shadow-2xl p-16 lg:p-24 border border-slate-100 text-center space-y-8 relative overflow-hidden">
-             <div className="absolute top-0 left-0 w-full h-3 bg-primary"></div>
-             <div className="w-32 h-32 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-primary text-6xl shadow-inner border border-slate-50">
+        <div className="max-w-4xl mx-auto animate-in zoom-in duration-500 pb-20 px-1 md:px-0">
+          <div className="bg-white rounded-2xl md:rounded-[5rem] shadow-2xl p-8 md:p-16 lg:p-24 border border-slate-100 text-center space-y-6 md:space-y-8 relative overflow-hidden">
+             <div className="absolute top-0 left-0 w-full h-2 md:h-3 bg-primary"></div>
+             <div className="w-20 h-20 md:w-32 md:h-32 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-primary text-3xl md:text-6xl shadow-inner border border-slate-50">
                <i className="fas fa-check-circle"></i>
              </div>
-             <div className="space-y-4">
-               <h2 className="text-5xl md:text-7xl font-black text-primary tracking-tighter uppercase">{paymentMethod === 'cash' ? 'Reserved!' : 'Success!'}</h2>
-               <p className="text-slate-500 text-lg md:text-xl font-medium max-w-sm mx-auto">
+             <div className="space-y-3 md:space-y-4">
+               <h2 className="text-3xl md:text-7xl font-black text-primary tracking-tighter uppercase">{paymentMethod === 'cash' ? 'Reserved!' : 'Success!'}</h2>
+               <p className="text-slate-500 text-sm md:text-xl font-medium max-w-sm mx-auto">
                  {paymentMethod === 'cash'
                    ? <>Your slot at <span className="text-primary font-black">{selectedCourt.name}</span> has been reserved. Pay at the front desk on arrival.</>
                    : <>Your booking at <span className="text-primary font-black">{selectedCourt.name}</span> has been processed successfully.</>
                  }
                </p>
              </div>
-             <div className="bg-slate-50 p-8 md:p-10 rounded-[2.5rem] md:rounded-[3.5rem] border border-slate-100 space-y-4 max-w-md mx-auto">
-                <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-slate-400">
+             <div className="bg-slate-50 p-5 md:p-10 rounded-2xl md:rounded-[3.5rem] border border-slate-100 space-y-3 md:space-y-4 max-w-md mx-auto">
+                <div className="flex justify-between items-center text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400">
                   <span>Reference</span>
                   <span className="text-primary">{bookingRefCode}</span>
                 </div>
-                <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-slate-400">
+                <div className="flex justify-between items-center text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400">
                   <span>Payment</span>
                   <span className="text-primary">{paymentMethod === 'gcash' ? 'GCash' : 'Pay at Court'}</span>
                 </div>
-                <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-slate-400">
+                <div className="flex justify-between items-center text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400">
                   <span>Status</span>
                   <span className={paymentMethod === 'gcash' ? 'text-amber-500' : 'text-blue-500'}>
                     {paymentMethod === 'gcash' ? 'Pending Verification' : 'Reserved — Pay on Arrival'}
                   </span>
                 </div>
              </div>
-             <button 
+             <button
                 onClick={() => setBookingStep('confirmation')}
-                className="bg-primary text-white px-12 py-6 rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-sm"
+                className="w-full md:w-auto bg-primary text-white px-8 md:px-12 py-4 md:py-6 rounded-xl md:rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-xs md:text-sm"
               >
                View Confirmation
              </button>
@@ -1618,7 +1618,7 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-white overflow-x-hidden">
       <header className={`fixed top-0 left-0 right-0 z-40 transition-transform duration-300 ${headerVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="max-w-7xl mx-auto px-2 md:px-4 pt-2 md:pt-4">
-          <div className="bg-white/80 backdrop-blur-xl rounded-2xl md:rounded-[1.5rem] shadow-lg shadow-slate-200/40 border border-slate-100/80 h-16 md:h-20 flex items-center px-4 md:px-8">
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl md:rounded-[1.5rem] shadow-lg shadow-slate-200/40 border border-slate-100/80 h-12 md:h-20 flex items-center px-3 md:px-8">
             <div className="w-full flex items-center justify-between">
               <div onClick={() => { setActiveTab('home'); setSelectedCourt(null); setBookingStep('details'); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="cursor-pointer">
                 <Logo />
@@ -1641,15 +1641,15 @@ const App: React.FC = () => {
                 <div className="hidden sm:block text-right">
                    <p className="text-sm md:text-base font-black text-primary tracking-tight">John Doe</p>
                 </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-[1rem] flex items-center justify-center shadow-sm border-2 bg-primary text-white border-primary">
-                  <i className="fas fa-user text-lg md:text-xl"></i>
+                <div className="w-7 h-7 md:w-12 md:h-12 rounded-lg md:rounded-[1rem] flex items-center justify-center shadow-sm border-2 bg-primary text-white border-primary">
+                  <i className="fas fa-user text-[10px] md:text-xl"></i>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </header>
-      <div className="h-20 md:h-28"></div>
+      <div className="h-16 md:h-28"></div>
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-16 pb-20 md:pb-16">
         {activeTab === 'home' && renderHome()}
