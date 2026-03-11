@@ -2,7 +2,17 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { COURTS, COMMUNITY_EVENTS } from './constants';
 import { Court, SportType, CommunityEvent } from './types';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, startOfDay, isToday } from 'date-fns';
+import emailjs from '@emailjs/browser';
+
+const EMAILJS = {
+  serviceId: 'service_s7c5i2j',
+  publicKey: 'qKw3YTXia-UqdC7Po',
+  templates: {
+    bookingAndRegistration: 'template_0g8xhgv',
+    postEvent: 'template_gej3ydr',
+  },
+};
 
 // Lazy load the entire Map component to keep initial bundle small
 const MapComponent = lazy(() => import('./components/MapComponent'));
@@ -64,8 +74,21 @@ const App: React.FC = () => {
   const [userPhone, setUserPhone] = useState('');
 
   const browseRef = useRef<HTMLDivElement>(null);
+  const exploreCourtsRef = useRef<HTMLDivElement>(null);
+  const courtsGridRef = useRef<HTMLDivElement>(null);
   const [headerVisible, setHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
+
+  const scrollAndBounce = (ref: React.RefObject<HTMLElement | null>, selector?: string) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => {
+      const target = selector ? ref.current?.querySelector(selector) : ref.current;
+      if (target) {
+        target.classList.add('animate-subtle-bounce');
+        setTimeout(() => target.classList.remove('animate-subtle-bounce'), 800);
+      }
+    }, 600);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -209,8 +232,8 @@ const App: React.FC = () => {
               { icon: 'fa-calendar-check', title: 'Book Your Slot' },
             ].map((item, i) => (
               <div key={i} className="text-center space-y-5 px-8 lg:px-14">
-                <div className="w-20 h-20 lg:w-28 lg:h-28 bg-white rounded-3xl lg:rounded-[2rem] flex items-center justify-center mx-auto border-2 border-slate-100 shadow-lg">
-                  <i className={`fas ${item.icon} text-3xl lg:text-5xl text-primary`}></i>
+                <div className="flex items-center justify-center mx-auto">
+                  <i className={`fas ${item.icon} text-5xl lg:text-7xl text-primary`}></i>
                 </div>
                 <h3 className="font-black text-lg lg:text-2xl text-primary uppercase tracking-tight">{item.title}</h3>
               </div>
@@ -231,8 +254,8 @@ const App: React.FC = () => {
               { icon: 'fa-calendar-check', title: 'Book Your Slot' },
             ].map((item, i) => (
               <div key={i} className="text-center space-y-2.5 px-3 flex-1">
-                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mx-auto border-2 border-slate-100 shadow-md">
-                  <i className={`fas ${item.icon} text-xl text-primary`}></i>
+                <div className="flex items-center justify-center mx-auto">
+                  <i className={`fas ${item.icon} text-3xl text-primary`}></i>
                 </div>
                 <h3 className="font-black text-[10px] text-primary uppercase tracking-tight leading-tight">{item.title}</h3>
               </div>
@@ -243,7 +266,7 @@ const App: React.FC = () => {
 
       {/* Courts Listing */}
       <section ref={browseRef} className="space-y-12 scroll-mt-28 pb-16">
-        <div className="flex flex-col lg:flex-row justify-between items-center gap-6 md:gap-8 bg-primary-extralight p-6 md:p-12 rounded-2xl md:rounded-[4rem] shadow-sm border border-primary/5">
+        <div ref={exploreCourtsRef} className="flex flex-col lg:flex-row justify-between items-center gap-6 md:gap-8 bg-primary-extralight p-6 md:p-12 rounded-2xl md:rounded-[4rem] shadow-sm border border-primary/5">
           <div className="text-center lg:text-left">
              <h2 className="text-3xl md:text-5xl font-black text-primary tracking-tighter uppercase">Explore Courts</h2>
              <p className="text-primary/60 font-bold text-sm md:text-lg">Premium courts for every skill level.</p>
@@ -289,7 +312,7 @@ const App: React.FC = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div ref={courtsGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredCourts.map(court => (
             <CourtCard key={court.id} court={court} onBook={() => handleCourtSelect(court)} />
           ))}
@@ -577,30 +600,45 @@ const App: React.FC = () => {
     if (bookingStep === 'calendar') {
       const facilityCourts = Array.from({ length: selectedCourt?.numberOfCourts || 8 }, (_, i) => `Court ${i + 1}`);
       const timeSlots = [
-        '8:00 AM - 9:00 AM', '9:00 AM - 10:00 AM', '10:00 AM - 11:00 AM', '11:00 AM - 12:00 PM',
-        '12:00 PM - 1:00 PM', '1:00 PM - 2:00 PM', '2:00 PM - 3:00 PM', '3:00 PM - 4:00 PM',
-        '4:00 PM - 5:00 PM', '5:00 PM - 6:00 PM', '6:00 PM - 7:00 PM', '7:00 PM - 8:00 PM',
-        '8:00 PM - 9:00 PM', '9:00 PM - 10:00 PM', '10:00 PM - 11:00 PM', '11:00 PM - 12:00 AM'
+        '8am - 9am', '9am - 10am', '10am - 11am', '11am - 12pm',
+        '12pm - 1pm', '1pm - 2pm', '2pm - 3pm', '3pm - 4pm',
+        '4pm - 5pm', '5pm - 6pm', '6pm - 7pm', '7pm - 8pm',
+        '8pm - 9pm', '9pm - 10pm', '10pm - 11pm', '11pm - 12am'
       ];
 
       const getSlotStatus = (court: string, time: string) => {
+        // Check if this time slot is in the past
+        if (isToday(selectedDate)) {
+          const now = new Date().getHours();
+          const startHour = (() => {
+            const match = time.match(/^(\d+)(am|pm)/);
+            if (!match) return 0;
+            let h = parseInt(match[1]);
+            if (match[2] === 'pm' && h !== 12) h += 12;
+            if (match[2] === 'am' && h === 12) h = 0;
+            return h;
+          })();
+          if (startHour <= now) return 'past';
+        }
+        if (selectedDate < startOfDay(new Date())) return 'past';
+
         const isSelected = selectedSlots.some(s => s.court === court && s.time === time);
         if (isSelected) return 'selected';
-        
+
         const dateStr = format(selectedDate, 'yyyy-MM-dd');
         const isBooked = bookedSlots.some(s => s.facilityId === selectedCourt?.id && s.date === dateStr && s.court === court && s.time === time);
         if (isBooked) return 'booked';
-        
-        if (time.includes('10:00 PM') || time.includes('11:00 PM')) {
+
+        if (time.includes('10pm') || time.includes('11pm')) {
           return 'closing';
         }
-        
-        if (time.includes('5:00 PM') || time.includes('6:00 PM') || time.includes('7:00 PM')) {
+
+        if (time.includes('5pm') || time.includes('6pm') || time.includes('7pm')) {
           if (court === 'Court 4' || court === 'Court 5' || court === 'Court 6') {
             return 'open-play';
           }
         }
-        
+
         return 'available';
       };
 
@@ -619,22 +657,22 @@ const App: React.FC = () => {
       const totalPrice = selectedSlots.length * (selectedCourt?.price || 0);
 
       return (
-        <div className="max-w-[1200px] mx-auto animate-in slide-in-from-bottom-12 duration-500 pb-40">
-          
-          <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+        <div className="max-w-[1200px] mx-auto animate-in slide-in-from-bottom-12 duration-500 pb-40 px-1 md:px-0">
+
+          <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl p-4 md:p-8 border border-slate-100">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 md:gap-6 mb-6 md:mb-8">
               <div>
-                <h2 className="text-3xl font-black text-slate-800 tracking-tight">Book a Court</h2>
-                <p className="text-slate-500 mt-1">Select a date and time to reserve your spot.</p>
+                <h2 className="text-xl md:text-3xl font-black text-slate-800 tracking-tight">Book a Court</h2>
+                <p className="text-slate-500 mt-1 text-xs md:text-base">Select a date and time to reserve your spot.</p>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <div 
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 min-w-[200px] cursor-pointer hover:bg-slate-50 transition-colors"
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                <div className="relative w-full md:w-auto">
+                  <div
+                    className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl border border-slate-200 min-w-0 md:min-w-[200px] cursor-pointer hover:bg-slate-50 transition-colors"
                     onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
                   >
-                    <i className="far fa-calendar text-slate-400"></i>
-                    <span className="font-medium text-slate-700">{format(selectedDate, 'MMMM do, yyyy')}</span>
+                    <i className="far fa-calendar text-slate-400 text-sm"></i>
+                    <span className="font-medium text-slate-700 text-sm md:text-base">{format(selectedDate, 'MMMM do, yyyy')}</span>
                   </div>
                   
                   {isDatePickerOpen && (
@@ -655,13 +693,16 @@ const App: React.FC = () => {
                          {eachDayOfInterval({ start: startOfWeek(startOfMonth(currentMonth)), end: endOfWeek(endOfMonth(currentMonth)) }).map(date => {
                            const isSelected = isSameDay(date, selectedDate);
                            const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
+                           const isPast = date < startOfDay(new Date());
                            return (
                              <button
                                key={date.toISOString()}
-                               onClick={() => { setSelectedDate(date); setIsDatePickerOpen(false); }}
+                               disabled={isPast}
+                               onClick={() => { if (!isPast) { setSelectedDate(date); setIsDatePickerOpen(false); } }}
                                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors mx-auto
-                                 ${isSelected ? 'bg-primary text-white font-bold shadow-md' : 'hover:bg-slate-100'}
-                                 ${!isCurrentMonth && !isSelected ? 'text-slate-300' : 'text-slate-700'}
+                                 ${isPast ? 'text-slate-200 cursor-not-allowed' : isSelected ? 'bg-primary text-white font-bold shadow-md' : 'hover:bg-slate-100'}
+                                 ${!isPast && !isCurrentMonth && !isSelected ? 'text-slate-300' : ''}
+                                 ${!isPast && isCurrentMonth && !isSelected ? 'text-slate-700' : ''}
                                `}
                              >
                                {date.getDate()}
@@ -675,34 +716,36 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 text-sm font-medium mb-8">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 bg-white text-slate-600"><div className="w-3 h-3 rounded-full border border-slate-300"></div> Available</div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#113f59] text-white"><div className="w-3 h-3 rounded-full bg-white/20"></div> Selected</div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#00a651] text-white"><div className="w-3 h-3 rounded-full bg-white/20"></div> Booked</div>
+            <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs md:text-sm font-medium mb-6 md:mb-8">
+              <div className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-slate-200 bg-white text-slate-600"><div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full border border-slate-300"></div> Available</div>
+              <div className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-primary text-white"><div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-white/20"></div> Selected</div>
+              <div className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-[#00a651] text-white"><div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-white/20"></div> Booked</div>
             </div>
 
-            <div className="overflow-x-auto border border-slate-200 rounded-2xl">
-              <table className="w-full text-sm text-center border-collapse min-w-[1000px] table-fixed">
+            <div className="overflow-x-auto border border-slate-200 rounded-xl md:rounded-2xl -mx-1 md:mx-0">
+              <table className="w-full text-xs md:text-sm text-center border-collapse min-w-[700px] md:min-w-[1000px] table-fixed">
                 <thead>
                   <tr>
-                    <th className="p-4 border-b border-r border-slate-200 bg-slate-50 w-40 font-bold text-slate-500 uppercase text-[10px] tracking-widest">Time</th>
+                    <th className="p-2 md:p-4 border-b border-r border-slate-200 bg-slate-50 w-24 md:w-40 font-bold text-slate-500 uppercase text-[8px] md:text-[10px] tracking-widest sticky left-0 z-10">Time</th>
                     {facilityCourts.map(court => (
-                      <th key={court} className="p-4 border-b border-r border-slate-200 bg-white font-black text-slate-800">{court}</th>
+                      <th key={court} className="p-2 md:p-4 border-b border-r border-slate-200 bg-white font-black text-slate-800 text-[10px] md:text-sm">{court}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {timeSlots.map(time => (
                     <tr key={time}>
-                      <td className="p-3 border-b border-r border-slate-200 bg-white text-[10px] font-bold text-slate-500 whitespace-nowrap">{time}</td>
+                      <td className="p-1.5 md:p-3 border-b border-r border-slate-200 bg-white text-[8px] md:text-[10px] font-bold text-slate-500 whitespace-nowrap sticky left-0 z-10">{time}</td>
                       {facilityCourts.map(court => {
                         const status = getSlotStatus(court, time);
                         
-                        let cellClasses = "p-2 border-b border-r border-slate-200 relative cursor-pointer transition-colors h-16 ";
+                        let cellClasses = "p-1 md:p-2 border-b border-r border-slate-200 relative cursor-pointer transition-colors h-10 md:h-16 ";
                         let content = null;
                         
-                        if (status === 'selected') {
-                          cellClasses += "bg-[#113f59] border-[#113f59]";
+                        if (status === 'past') {
+                          cellClasses += "bg-slate-50 cursor-not-allowed";
+                        } else if (status === 'selected') {
+                          cellClasses += "bg-primary border-primary";
                           content = <i className="fas fa-check text-white text-xl"></i>;
                         } else if (status === 'booked') {
                           cellClasses += "bg-[#e6f7ed] border-[#00a651] cursor-not-allowed";
@@ -739,26 +782,26 @@ const App: React.FC = () => {
           </div>
 
           {/* Floating Action Bar */}
-          <div className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-slate-100 p-4 md:p-6 flex items-center gap-6 md:gap-12 z-50 animate-in slide-in-from-bottom-8 w-[calc(100%-2rem)] md:w-auto max-w-lg md:max-w-none">
-            <button onClick={() => setBookingStep('details')} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-              <i className="fas fa-times"></i>
+          <div className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 bg-white rounded-xl md:rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-slate-100 p-3 md:p-6 flex items-center gap-4 md:gap-12 z-50 animate-in slide-in-from-bottom-8 w-[calc(100%-1.5rem)] md:w-auto max-w-lg md:max-w-none">
+            <button onClick={() => setBookingStep('details')} className="absolute top-2 md:top-4 right-3 md:right-4 text-slate-400 hover:text-slate-600">
+              <i className="fas fa-times text-xs md:text-base"></i>
             </button>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Selected Slots</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-[#113f59]">{selectedSlots.length}</span>
-                <span className="text-sm font-bold text-slate-400">slots <span className="font-normal text-slate-300">/ 9 max</span></span>
+            <div className="min-w-0">
+              <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5 md:mb-1">Selected Slots</p>
+              <div className="flex items-baseline gap-1.5 md:gap-2">
+                <span className="text-2xl md:text-3xl font-black text-primary">{selectedSlots.length}</span>
+                <span className="text-xs md:text-sm font-bold text-slate-400">slots <span className="font-normal text-slate-300">/ 9 max</span></span>
               </div>
-              <p className="text-sm font-black text-slate-800 mt-1">Total: ₱{totalPrice}</p>
+              <p className="text-xs md:text-sm font-black text-slate-800 mt-0.5 md:mt-1">Total: ₱{totalPrice}</p>
             </div>
-            <button 
+            <button
               disabled={selectedSlots.length === 0}
               onClick={() => setBookingStep('payment')}
-              className={`px-8 py-4 rounded-xl font-black text-white flex items-center gap-3 transition-all
-                ${selectedSlots.length > 0 ? 'bg-[#113f59] hover:bg-[#0a2a3d] shadow-xl' : 'bg-slate-300 cursor-not-allowed'}
+              className={`px-4 md:px-8 py-3 md:py-4 rounded-xl font-black text-white flex items-center gap-2 md:gap-3 transition-all text-xs md:text-base shrink-0
+                ${selectedSlots.length > 0 ? 'bg-primary hover:bg-primary-dark shadow-xl' : 'bg-slate-300 cursor-not-allowed'}
               `}
             >
-              Proceed to Pay <i className="fas fa-chevron-right text-xs"></i>
+              Proceed <span className="hidden md:inline">to Pay</span> <i className="fas fa-chevron-right text-[10px] md:text-xs"></i>
             </button>
           </div>
         </div>
@@ -876,10 +919,22 @@ const App: React.FC = () => {
                   </div>
 
                   <div className="space-y-4">
-                    <div className="bg-white p-5 md:p-6 rounded-2xl border border-blue-100">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Send to this Number</p>
-                      <p className="font-black text-2xl md:text-3xl text-primary tracking-tight">{selectedCourt.phone}</p>
-                      <p className="text-sm text-slate-500 font-bold mt-1">{selectedCourt.name}</p>
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <div className="bg-white p-5 md:p-6 rounded-2xl border border-blue-100 flex-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Send to this Number</p>
+                        <p className="font-black text-2xl md:text-3xl text-primary tracking-tight">{selectedCourt.phone}</p>
+                        <p className="text-sm text-slate-500 font-bold mt-1">{selectedCourt.name}</p>
+                      </div>
+                      <div className="bg-white p-5 md:p-6 rounded-2xl border border-blue-100 flex items-center justify-center">
+                        <div className="text-center space-y-2">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Scan to Pay</p>
+                          <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(selectedCourt.phone)}`}
+                            alt="GCash QR Code"
+                            className="w-28 h-28 md:w-36 md:h-36 mx-auto rounded-lg"
+                          />
+                        </div>
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white p-5 md:p-6 rounded-2xl border border-blue-100">
@@ -999,6 +1054,31 @@ const App: React.FC = () => {
                       time: s.time
                     }));
                     setBookedSlots(prev => [...prev, ...newBookedSlots]);
+
+                    // Send booking email
+                    const totalPrice = selectedSlots.length * (selectedCourt?.price || 0);
+                    emailjs.send(EMAILJS.serviceId, EMAILJS.templates.bookingAndRegistration, {
+                      type: 'NEW COURT BOOKING',
+                      heading_label: 'REFERENCE CODE',
+                      heading_value: bookingRefCode,
+                      detail_1_label: 'Court',
+                      detail_1_value: selectedCourt.name,
+                      detail_2_label: 'Date',
+                      detail_2_value: format(selectedDate, 'EEEE, MMMM do, yyyy'),
+                      detail_3_label: 'Time Slots',
+                      detail_3_value: selectedSlots.map(s => `${s.court}: ${s.time}`).join(' | '),
+                      detail_4_label: 'Total',
+                      detail_4_value: `₱${totalPrice}.00`,
+                      detail_5_label: 'Payment',
+                      detail_5_value: paymentMethod === 'gcash' ? 'GCash' : 'Pay at Court',
+                      person_section_title: 'BOOKED BY',
+                      user_name: userName,
+                      user_email: userEmail,
+                      user_phone: userPhone,
+                      name: userName,
+                      email: userEmail,
+                    }, EMAILJS.publicKey);
+
                     setShowUserFormModal(false);
                     setBookingStep('success');
                   }}
@@ -1314,34 +1394,33 @@ const App: React.FC = () => {
                     alert('Please fill in all required fields');
                     return;
                   }
-                  const subject = encodeURIComponent(`[SportSync Event Submission] ${eventName}`);
-                  const body = encodeURIComponent(
-`EVENT DETAILS
-━━━━━━━━━━━━━━━━━━
-Event Name: ${eventName}
-Sport: ${sport}
-Date: ${date}
-Time: ${postEventData.time || 'TBD'}
-Location: ${location}
 
-Description:
-${description}
+                  emailjs.send(EMAILJS.serviceId, EMAILJS.templates.postEvent, {
+                    event_name: eventName,
+                    sport,
+                    date,
+                    time: postEventData.time || 'TBD',
+                    location,
+                    description,
+                    contact_name: contactName,
+                    contact_email: contactEmail,
+                    contact_phone: postEventData.contactPhone || 'N/A',
+                    name: contactName,
+                    email: contactEmail,
+                  }, EMAILJS.publicKey).then(() => {
+                    alert('Event request submitted successfully!');
+                  }).catch(() => {
+                    alert('Failed to send. Please try again.');
+                  });
 
-ORGANIZER CONTACT
-━━━━━━━━━━━━━━━━━━
-Name: ${contactName}
-Email: ${contactEmail}
-Phone: ${postEventData.contactPhone || 'N/A'}
-`);
-                  window.open(`mailto:astnjt1@gmail.com?subject=${subject}&body=${body}`, '_self');
                   setShowPostEventForm(false);
                   setPostEventData({ eventName: '', sport: '', date: '', time: '', location: '', description: '', contactName: '', contactEmail: '', contactPhone: '' });
                 }}
                 className="w-full bg-primary text-white py-5 md:py-6 rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-sm active:scale-95 flex items-center justify-center gap-3"
               >
-                <i className="fas fa-envelope"></i> Send Event Request
+                <i className="fas fa-envelope"></i> Submit Event Request
               </button>
-              <p className="text-center text-xs text-slate-400 font-medium">This will open your email client to send the event details for review.</p>
+              <p className="text-center text-xs text-slate-400 font-medium">Your event details will be sent directly to our team for review.</p>
             </div>
           </div>
         </div>
@@ -1456,6 +1535,28 @@ Phone: ${postEventData.contactPhone || 'N/A'}
                   <button
                     onClick={() => {
                       if (userName && userEmail && userPhone) {
+                        // Send event registration email
+                        emailjs.send(EMAILJS.serviceId, EMAILJS.templates.bookingAndRegistration, {
+                          type: 'NEW EVENT REGISTRATION',
+                          heading_label: 'EVENT',
+                          heading_value: selectedEvent?.title || '',
+                          detail_1_label: 'Type',
+                          detail_1_value: selectedEvent?.type || '',
+                          detail_2_label: 'Date',
+                          detail_2_value: selectedEvent?.date || '',
+                          detail_3_label: 'Location',
+                          detail_3_value: selectedEvent?.location || '',
+                          detail_4_label: '',
+                          detail_4_value: '',
+                          detail_5_label: '',
+                          detail_5_value: '',
+                          person_section_title: 'REGISTERED BY',
+                          user_name: userName,
+                          user_email: userEmail,
+                          user_phone: userPhone,
+                          name: userName,
+                          email: userEmail,
+                        }, EMAILJS.publicKey);
                         setEventRegistrationStep('success');
                       } else {
                         alert('Please fill in all fields');
