@@ -26,16 +26,3 @@ export interface BookingDetails {
   userName: string;
   userEmail: string;
 }
-
-export interface CommunityEvent {
-  id: string;
-  title: string;
-  date: string;
-  courtId: string;
-  locationName: string;
-  address: string;
-  description: string;
-  registrationFee: string;
-  participants: number;
-  icon: string;
-}

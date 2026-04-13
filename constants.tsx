@@ -1,5 +1,5 @@
 
-import { Court, CommunityEvent } from './types';
+import { Court } from './types';
 
 export const COURTS: Court[] = [
   {
@@ -81,56 +81,5 @@ export const COURTS: Court[] = [
     phone: '+63 82 298 7890',
     email: 'support@crisron.ph',
     numberOfCourts: 8
-  }
-];
-
-export const COMMUNITY_EVENTS: CommunityEvent[] = [
-  {
-    id: 'e1',
-    title: 'City Smash',
-    date: 'JUN 15, 2026',
-    courtId: 'c1',
-    locationName: 'Smash Ville Fitness Center',
-    address: '31 T.Monteverde St, Poblacion District, Davao City, 8000 Davao del Sur',
-    description: 'Join the biggest local badminton tournament in Davao City. Open to all skill levels with pro categorization. Cash prizes for winners!',
-    registrationFee: '₱500',
-    participants: 45,
-    icon: 'fa-trophy'
-  },
-  {
-    id: 'e2',
-    title: 'Open Masters',
-    date: 'JUN 22, 2026',
-    courtId: 'c2',
-    locationName: 'MTS Pickleball Courts',
-    address: 'Matina Town Square, Talomo, Davao City, Davao del Sur',
-    description: 'Compete in the Open Masters pickleball event. A great way to meet the local community and test your skills.',
-    registrationFee: '₱450',
-    participants: 32,
-    icon: 'fa-medal'
-  },
-  {
-    id: 'e3',
-    title: 'Elite 3v3',
-    date: 'JUL 05, 2026',
-    courtId: 'c3',
-    locationName: 'Evergold Recreation Center',
-    address: 'Iñigo St, Obrero, Davao City, Davao del Sur',
-    description: 'Gather your squad for an intense 3v3 basketball showdown. Full-court action with certified referees.',
-    registrationFee: '₱1200/team',
-    participants: 24,
-    icon: 'fa-basketball'
-  },
-  {
-    id: 'e4',
-    title: 'Legacy Cup',
-    date: 'JUL 18, 2026',
-    courtId: 'c4',
-    locationName: 'Badminton World',
-    address: 'Avanceña St, Poblacion District, Davao City, 8000 Davao del Sur',
-    description: 'The annual Legacy Cup is back! Experience elite competition at Badminton World. Register early to secure your spot.',
-    registrationFee: '₱600',
-    participants: 60,
-    icon: 'fa-trophy'
   }
 ];

@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { COURTS, COMMUNITY_EVENTS } from './constants';
-import { Court, SportType, CommunityEvent } from './types';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, startOfDay, isToday } from 'date-fns';
+import { COURTS } from './constants';
+import { Court, SportType } from './types';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, startOfDay, isToday, addDays } from 'date-fns';
 import emailjs from '@emailjs/browser';
 
 const EMAILJS = {
@@ -10,7 +10,6 @@ const EMAILJS = {
   publicKey: 'qKw3YTXia-UqdC7Po',
   templates: {
     bookingAndRegistration: 'template_0g8xhgv',
-    postEvent: 'template_gej3ydr',
   },
 };
 
@@ -46,8 +45,6 @@ const App: React.FC = () => {
   const [sortAsc, setSortAsc] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<CommunityEvent | null>(null);
-  const [eventRegistrationStep, setEventRegistrationStep] = useState<'details' | 'form' | 'success'>('details');
   const [selectedSlots, setSelectedSlots] = useState<{court: string, time: string}[]>([]);
   const [bookingStep, setBookingStep] = useState<'details' | 'calendar' | 'payment' | 'success' | 'confirmation'>('details');
   const [detailSubTab, setDetailSubTab] = useState<'map' | 'photos' | 'pricing' | 'availability'>('map');
@@ -67,8 +64,6 @@ const App: React.FC = () => {
   const [showUserFormModal, setShowUserFormModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'gcash' | 'cash' | null>(null);
   const [bookingRefCode, setBookingRefCode] = useState('');
-  const [showPostEventForm, setShowPostEventForm] = useState(false);
-  const [postEventData, setPostEventData] = useState({ eventName: '', sport: '', date: '', time: '', location: '', description: '', contactName: '', contactEmail: '', contactPhone: '' });
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userPhone, setUserPhone] = useState('');
@@ -106,6 +101,15 @@ const App: React.FC = () => {
 
   useEffect(() => {
     checkAuthStatus();
+    const saved = localStorage.getItem('sportsync_user');
+    if (saved) {
+      try {
+        const { name, email, phone } = JSON.parse(saved);
+        if (name) setUserName(name);
+        if (email) setUserEmail(email);
+        if (phone) setUserPhone(phone);
+      } catch {}
+    }
   }, []);
 
   const checkAuthStatus = async () => {
@@ -313,9 +317,29 @@ const App: React.FC = () => {
         </div>
 
         <div ref={courtsGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredCourts.map(court => (
-            <CourtCard key={court.id} court={court} onBook={() => handleCourtSelect(court)} />
-          ))}
+          {filteredCourts.map(court => {
+            const todayStr = format(new Date(), 'yyyy-MM-dd');
+            const timeSlotCount = 16;
+            const bookedToday = bookedSlots.filter(s => s.facilityId === court.id && s.date === todayStr).length;
+            const availableToday = Math.max(0, (court.numberOfCourts || 1) * timeSlotCount - bookedToday);
+            return (
+              <CourtCard
+                key={court.id}
+                court={court}
+                availableToday={availableToday}
+                onBook={() => handleCourtSelect(court)}
+                onQuickBook={() => {
+                  setSelectedCourt(court);
+                  setSelectedSlots([]);
+                  setActiveTab('booking');
+                  setBookingStep('calendar');
+                  setPaymentMethod(null);
+                  setBookingRefCode('');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              />
+            );
+          })}
         </div>
       </section>
     </div>
@@ -665,51 +689,63 @@ const App: React.FC = () => {
                 <h2 className="text-xl md:text-3xl font-black text-slate-800 tracking-tight">Book a Court</h2>
                 <p className="text-slate-500 mt-1 text-xs md:text-base">Select a date and time to reserve your spot.</p>
               </div>
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                <div className="relative w-full md:w-auto">
-                  <div
-                    className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl border border-slate-200 min-w-0 md:min-w-[200px] cursor-pointer hover:bg-slate-50 transition-colors"
+              <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1">
+                {Array.from({ length: 7 }, (_, i) => addDays(new Date(), i)).map((date, i) => {
+                  const isSelected = isSameDay(date, selectedDate);
+                  const dayLabel = i === 0 ? 'Today' : format(date, 'EEE');
+                  return (
+                    <button
+                      key={date.toISOString()}
+                      onClick={() => setSelectedDate(date)}
+                      className={`flex flex-col items-center px-3 md:px-4 py-2 md:py-2.5 rounded-xl border transition-all shrink-0 min-w-[52px] md:min-w-[60px]
+                        ${isSelected ? 'bg-primary text-white border-primary shadow-lg' : 'bg-white border-slate-200 text-slate-600 hover:border-primary hover:text-primary'}`}
+                    >
+                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">{dayLabel}</span>
+                      <span className="text-base md:text-lg font-black leading-tight">{format(date, 'd')}</span>
+                    </button>
+                  );
+                })}
+                <div className="relative shrink-0">
+                  <button
                     onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+                    className="flex flex-col items-center px-3 md:px-4 py-2 md:py-2.5 rounded-xl border border-slate-200 text-slate-400 hover:border-primary hover:text-primary transition-all min-w-[52px] md:min-w-[60px]"
                   >
-                    <i className="far fa-calendar text-slate-400 text-sm"></i>
-                    <span className="font-medium text-slate-700 text-sm md:text-base">{format(selectedDate, 'MMMM do, yyyy')}</span>
-                  </div>
-                  
+                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">More</span>
+                    <i className="fas fa-calendar text-base md:text-lg mt-0.5"></i>
+                  </button>
                   {isDatePickerOpen && (
-                    <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 z-50 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 w-72">
-                       {/* Calendar Header */}
-                       <div className="flex justify-between items-center mb-4">
-                         <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-slate-50 rounded-lg transition-colors"><i className="fas fa-chevron-left text-slate-400"></i></button>
-                         <span className="font-bold text-slate-700">{format(currentMonth, 'MMMM yyyy')}</span>
-                         <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 hover:bg-slate-50 rounded-lg transition-colors"><i className="fas fa-chevron-right text-slate-400"></i></button>
-                       </div>
-                       {/* Calendar Grid */}
-                       <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                           <div key={day} className="text-[10px] font-black uppercase text-slate-400 py-1">{day}</div>
-                         ))}
-                       </div>
-                       <div className="grid grid-cols-7 gap-1">
-                         {eachDayOfInterval({ start: startOfWeek(startOfMonth(currentMonth)), end: endOfWeek(endOfMonth(currentMonth)) }).map(date => {
-                           const isSelected = isSameDay(date, selectedDate);
-                           const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
-                           const isPast = date < startOfDay(new Date());
-                           return (
-                             <button
-                               key={date.toISOString()}
-                               disabled={isPast}
-                               onClick={() => { if (!isPast) { setSelectedDate(date); setIsDatePickerOpen(false); } }}
-                               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors mx-auto
-                                 ${isPast ? 'text-slate-200 cursor-not-allowed' : isSelected ? 'bg-primary text-white font-bold shadow-md' : 'hover:bg-slate-100'}
-                                 ${!isPast && !isCurrentMonth && !isSelected ? 'text-slate-300' : ''}
-                                 ${!isPast && isCurrentMonth && !isSelected ? 'text-slate-700' : ''}
-                               `}
-                             >
-                               {date.getDate()}
-                             </button>
-                           );
-                         })}
-                       </div>
+                    <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 w-72">
+                      <div className="flex justify-between items-center mb-4">
+                        <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-slate-50 rounded-lg transition-colors"><i className="fas fa-chevron-left text-slate-400"></i></button>
+                        <span className="font-bold text-slate-700">{format(currentMonth, 'MMMM yyyy')}</span>
+                        <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 hover:bg-slate-50 rounded-lg transition-colors"><i className="fas fa-chevron-right text-slate-400"></i></button>
+                      </div>
+                      <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                          <div key={day} className="text-[10px] font-black uppercase text-slate-400 py-1">{day}</div>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">
+                        {eachDayOfInterval({ start: startOfWeek(startOfMonth(currentMonth)), end: endOfWeek(endOfMonth(currentMonth)) }).map(date => {
+                          const isSelected = isSameDay(date, selectedDate);
+                          const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
+                          const isPast = date < startOfDay(new Date());
+                          return (
+                            <button
+                              key={date.toISOString()}
+                              disabled={isPast}
+                              onClick={() => { if (!isPast) { setSelectedDate(date); setIsDatePickerOpen(false); } }}
+                              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors mx-auto
+                                ${isPast ? 'text-slate-200 cursor-not-allowed' : isSelected ? 'bg-primary text-white font-bold shadow-md' : 'hover:bg-slate-100'}
+                                ${!isPast && !isCurrentMonth && !isSelected ? 'text-slate-300' : ''}
+                                ${!isPast && isCurrentMonth && !isSelected ? 'text-slate-700' : ''}
+                              `}
+                            >
+                              {date.getDate()}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -793,6 +829,15 @@ const App: React.FC = () => {
                 <span className="text-xs md:text-sm font-bold text-slate-400">slots <span className="font-normal text-slate-300">/ 9 max</span></span>
               </div>
               <p className="text-xs md:text-sm font-black text-slate-800 mt-0.5 md:mt-1">Total: ₱{totalPrice}</p>
+              {selectedSlots.length === 0 && (
+                <p className="text-[9px] text-slate-300 font-medium mt-0.5 hidden md:block">Tap any cell to add a slot — mix courts freely</p>
+              )}
+              {selectedSlots.length > 0 && (() => {
+                const courts = [...new Set(selectedSlots.map(s => s.court))];
+                return courts.length > 1 && (
+                  <p className="text-[9px] text-primary font-black mt-0.5 uppercase tracking-wider hidden md:block">{courts.length} courts selected</p>
+                );
+              })()}
             </div>
             <button
               disabled={selectedSlots.length === 0}
@@ -1079,6 +1124,7 @@ const App: React.FC = () => {
                       email: userEmail,
                     }, EMAILJS.publicKey);
 
+                    localStorage.setItem('sportsync_user', JSON.stringify({ name: userName, email: userEmail, phone: userPhone }));
                     setShowUserFormModal(false);
                     setBookingStep('success');
                   }}
@@ -1176,12 +1222,26 @@ const App: React.FC = () => {
                   </span>
                 </div>
              </div>
-             <button
-                onClick={() => setBookingStep('confirmation')}
-                className="w-full md:w-auto bg-primary text-white px-8 md:px-12 py-4 md:py-6 rounded-xl md:rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-xs md:text-sm"
-              >
-               View Confirmation
-             </button>
+             <div className="flex flex-col sm:flex-row gap-3 justify-center">
+               <button
+                  onClick={() => {
+                    const dateStr = format(selectedDate, 'yyyyMMdd');
+                    const title = encodeURIComponent(`Court Booking – ${selectedCourt.name}`);
+                    const details = encodeURIComponent(`Ref: ${bookingRefCode}\nSlots: ${selectedSlots.map(s => `${s.court} ${s.time}`).join(', ')}\nPayment: ${paymentMethod === 'gcash' ? 'GCash' : 'Pay at Court'}`);
+                    const location = encodeURIComponent(selectedCourt.location);
+                    window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateStr}/${dateStr}&details=${details}&location=${location}`, '_blank');
+                  }}
+                  className="flex items-center justify-center gap-2 px-6 md:px-10 py-4 md:py-6 rounded-xl md:rounded-[2rem] font-black border-2 border-slate-200 text-slate-600 hover:border-primary hover:text-primary transition text-xs md:text-sm uppercase tracking-widest"
+                >
+                  <i className="fab fa-google"></i> Add to Calendar
+               </button>
+               <button
+                  onClick={() => setBookingStep('confirmation')}
+                  className="flex items-center justify-center gap-2 bg-primary text-white px-8 md:px-12 py-4 md:py-6 rounded-xl md:rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-xs md:text-sm"
+                >
+                 View Confirmation
+               </button>
+             </div>
           </div>
         </div>
       );
@@ -1261,359 +1321,6 @@ const App: React.FC = () => {
     return null;
   };
 
-  const renderCommunity = () => (
-    <div className="space-y-8 md:space-y-16 animate-in fade-in duration-500">
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-6 md:gap-10 bg-primary p-6 md:p-12 lg:p-20 rounded-2xl md:rounded-[4rem] text-white shadow-2xl relative overflow-hidden border border-slate-800">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-[100px]"></div>
-        <div className="relative z-10 space-y-4 md:space-y-6 max-w-2xl text-center lg:text-left">
-          <span className="bg-white/10 text-white text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-[0.3em] inline-block border border-white/20">Community Hub</span>
-          <h2 className="text-4xl md:text-7xl font-black leading-[0.9] tracking-tighter uppercase">Local <br/>Events.</h2>
-          <p className="text-white/70 text-sm md:text-xl font-medium max-w-xl">Join tournaments, find pickup groups, and scale your game with local athletes.</p>
-        </div>
-        <button onClick={() => setShowPostEventForm(true)} className="relative z-10 bg-white text-primary px-8 md:px-12 py-4 md:py-6 rounded-2xl md:rounded-[2rem] font-black shadow-2xl hover:bg-slate-100 transition-transform active:scale-95 text-sm md:text-lg uppercase tracking-widest w-full md:w-auto">Post Event</button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10">
-         {COMMUNITY_EVENTS.map((event, i) => (
-           <div key={event.id} className="bg-white p-5 md:p-10 rounded-2xl md:rounded-[3.5rem] border border-slate-100 shadow-sm flex flex-row md:flex-col lg:flex-row gap-4 md:gap-10 items-start group hover:border-primary transition-all duration-500 hover:shadow-xl hover:shadow-slate-200/40">
-              <div className="w-16 h-16 md:w-28 md:h-28 bg-slate-50 rounded-2xl md:rounded-[2.5rem] flex items-center justify-center flex-shrink-0 group-hover:bg-primary transition-all duration-700 group-hover:rotate-12 shadow-sm border border-slate-200 group-hover:border-transparent text-primary">
-                <i className={`fas ${event.icon} text-2xl md:text-4xl group-hover:text-white transition-colors`}></i>
-              </div>
-              <div className="flex-1 space-y-3 md:space-y-5 min-w-0">
-                <div className="flex justify-between items-center">
-                   <span className="text-[9px] md:text-[10px] font-black text-primary bg-slate-50 px-3 md:px-4 py-1 md:py-1.5 rounded-full uppercase tracking-[0.2em] border border-slate-100">Featured</span>
-                   <span className="text-[10px] md:text-xs text-slate-400 font-black tracking-tighter">{event.date}</span>
-                </div>
-                <h3 className="font-black text-lg md:text-3xl text-primary leading-[1.1] tracking-tight group-hover:text-slate-800 transition-colors uppercase">
-                  {event.title}
-                </h3>
-                <p className="text-slate-500 font-bold leading-relaxed text-xs md:text-base line-clamp-2">{event.description}</p>
-                <div className="flex items-center justify-between pt-4 md:pt-8 border-t border-slate-100 mt-3 md:mt-6">
-                   <div className="flex items-center gap-2 md:gap-4">
-                     <div className="flex -space-x-3 md:-space-x-4">
-                       {[1, 2, 3, 4].map(p => (
-                         <div key={p} className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-2xl border-2 md:border-4 border-white bg-slate-100 flex items-center justify-center overflow-hidden shadow-sm">
-                           <img src={`https://i.pravatar.cc/150?u=${p + i * 4}`} alt={`User ${p}`} className="w-full h-full object-cover grayscale" />
-                         </div>
-                       ))}
-                     </div>
-                     <span className="text-[9px] md:text-[11px] text-slate-400 font-black uppercase tracking-wider md:tracking-widest">{event.participants}+</span>
-                   </div>
-                   <button
-                     onClick={() => {
-                       setSelectedEvent(event);
-                       setEventRegistrationStep('details');
-                     }}
-                     className="text-primary font-black text-[10px] md:text-xs uppercase tracking-[0.15em] md:tracking-[0.2em] hover:translate-x-3 transition-transform flex items-center gap-2 md:gap-3"
-                   >
-                     Details <i className="fas fa-arrow-right"></i>
-                   </button>
-                </div>
-              </div>
-           </div>
-         ))}
-      </div>
-
-      {showPostEventForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowPostEventForm(false)}></div>
-          <div className="relative bg-white rounded-[3rem] md:rounded-[4rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-slate-100 animate-in zoom-in-95 duration-300">
-            <button
-              onClick={() => setShowPostEventForm(false)}
-              className="absolute top-6 right-6 md:top-8 md:right-8 w-10 h-10 md:w-12 md:h-12 bg-slate-50 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-primary transition-colors z-10"
-            >
-              <i className="fas fa-times text-lg md:text-xl"></i>
-            </button>
-
-            <div className="p-8 sm:p-12 md:p-16 space-y-8">
-              <div className="space-y-3">
-                <span className="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-[0.2em] inline-block">Post Your Event</span>
-                <h2 className="text-3xl md:text-5xl font-black text-primary tracking-tighter uppercase leading-tight">Submit an Event</h2>
-                <p className="text-slate-500 font-medium text-sm md:text-base">Fill in the details below and we'll review your event for posting.</p>
-              </div>
-
-              <div className="bg-slate-50 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 space-y-5">
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Event Name *</label>
-                  <input type="text" value={postEventData.eventName} onChange={(e) => setPostEventData({...postEventData, eventName: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="e.g. Weekend Badminton Tournament" />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Sport *</label>
-                    <select value={postEventData.sport} onChange={(e) => setPostEventData({...postEventData, sport: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium bg-white">
-                      <option value="">Select sport</option>
-                      <option value="Badminton">Badminton</option>
-                      <option value="Basketball">Basketball</option>
-                      <option value="Pickleball">Pickleball</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Date *</label>
-                    <input type="date" value={postEventData.date} onChange={(e) => setPostEventData({...postEventData, date: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Time</label>
-                    <input type="text" value={postEventData.time} onChange={(e) => setPostEventData({...postEventData, time: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="e.g. 8:00 AM - 5:00 PM" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Location *</label>
-                    <input type="text" value={postEventData.location} onChange={(e) => setPostEventData({...postEventData, location: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="e.g. UM Badminton Court" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Event Description *</label>
-                  <textarea value={postEventData.description} onChange={(e) => setPostEventData({...postEventData, description: e.target.value})} rows={3} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium resize-none" placeholder="Describe your event, rules, fees, etc." />
-                </div>
-              </div>
-
-              <div className="bg-slate-50 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 space-y-5">
-                <h4 className="font-black text-xs text-primary uppercase tracking-widest">Your Contact Info</h4>
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Your Name *</label>
-                  <input type="text" value={postEventData.contactName} onChange={(e) => setPostEventData({...postEventData, contactName: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="John Doe" />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Email *</label>
-                    <input type="email" value={postEventData.contactEmail} onChange={(e) => setPostEventData({...postEventData, contactEmail: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="john@example.com" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Phone</label>
-                    <input type="tel" value={postEventData.contactPhone} onChange={(e) => setPostEventData({...postEventData, contactPhone: e.target.value})} className="w-full border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium" placeholder="+63 900 000 0000" />
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  const { eventName, sport, date, location, description, contactName, contactEmail } = postEventData;
-                  if (!eventName || !sport || !date || !location || !description || !contactName || !contactEmail) {
-                    alert('Please fill in all required fields');
-                    return;
-                  }
-
-                  emailjs.send(EMAILJS.serviceId, EMAILJS.templates.postEvent, {
-                    event_name: eventName,
-                    sport,
-                    date,
-                    time: postEventData.time || 'TBD',
-                    location,
-                    description,
-                    contact_name: contactName,
-                    contact_email: contactEmail,
-                    contact_phone: postEventData.contactPhone || 'N/A',
-                    name: contactName,
-                    email: contactEmail,
-                  }, EMAILJS.publicKey).then(() => {
-                    alert('Event request submitted successfully!');
-                  }).catch(() => {
-                    alert('Failed to send. Please try again.');
-                  });
-
-                  setShowPostEventForm(false);
-                  setPostEventData({ eventName: '', sport: '', date: '', time: '', location: '', description: '', contactName: '', contactEmail: '', contactPhone: '' });
-                }}
-                className="w-full bg-primary text-white py-5 md:py-6 rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-sm active:scale-95 flex items-center justify-center gap-3"
-              >
-                <i className="fas fa-envelope"></i> Submit Event Request
-              </button>
-              <p className="text-center text-xs text-slate-400 font-medium">Your event details will be sent directly to our team for review.</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {selectedEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedEvent(null)}></div>
-          <div className="relative bg-white rounded-2xl md:rounded-[4rem] shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-slate-100 animate-in zoom-in-95 duration-300">
-            <button
-              onClick={() => setSelectedEvent(null)}
-              className="absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 md:w-12 md:h-12 bg-slate-50 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-primary transition-colors z-10"
-            >
-              <i className="fas fa-times text-lg md:text-xl"></i>
-            </button>
-
-            <div className="p-6 md:p-12 lg:p-16 space-y-6 md:space-y-10">
-              {eventRegistrationStep === 'details' && (
-                <>
-                  <div className="flex flex-col sm:flex-row gap-5 md:gap-8 items-start">
-                    <div className="w-20 h-20 md:w-32 md:h-32 bg-primary-extralight rounded-2xl md:rounded-[2.5rem] flex items-center justify-center text-primary border border-primary/10 shadow-sm flex-shrink-0">
-                      <i className={`fas ${selectedEvent.icon} text-3xl md:text-5xl`}></i>
-                    </div>
-                    <div className="space-y-3 md:space-y-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-[9px] md:text-[10px] font-black text-white bg-primary px-3 md:px-4 py-1 md:py-1.5 rounded-full uppercase tracking-[0.2em] shadow-sm">Tournament</span>
-                        <span className="text-[10px] md:text-xs text-slate-400 font-black tracking-tighter">{selectedEvent.date}</span>
-                      </div>
-                      <h2 className="text-2xl md:text-5xl font-black text-primary tracking-tighter uppercase leading-tight">{selectedEvent.title}</h2>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                    <div className="bg-slate-50 p-5 md:p-8 rounded-2xl md:rounded-3xl border border-slate-100 space-y-2">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Location</p>
-                      <p className="font-black text-primary text-base md:text-xl uppercase">{selectedEvent.locationName}</p>
-                      <p className="text-xs md:text-sm text-slate-500 font-medium">{selectedEvent.address}</p>
-                    </div>
-                    <div className="bg-slate-50 p-5 md:p-8 rounded-2xl md:rounded-3xl border border-slate-100 space-y-2">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Registration Fee</p>
-                      <p className="font-black text-primary text-2xl md:text-3xl uppercase">{selectedEvent.registrationFee}</p>
-                      <p className="text-xs md:text-sm text-slate-500 font-medium">Includes event shirt & hydration</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 md:space-y-4">
-                    <h3 className="font-black text-base md:text-xl text-primary uppercase tracking-tight">Event Details</h3>
-                    <p className="text-slate-500 font-medium leading-relaxed text-sm md:text-lg">{selectedEvent.description}</p>
-                  </div>
-
-                  <div className="pt-6 md:pt-8 border-t border-slate-100 flex flex-col sm:flex-row gap-3 md:gap-4">
-                    <button
-                      onClick={() => setEventRegistrationStep('form')}
-                      className="flex-1 bg-primary text-white py-4 md:py-6 rounded-2xl md:rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-xs md:text-sm active:scale-95"
-                    >
-                      Register Now
-                    </button>
-                    <button
-                      onClick={() => {
-                        const court = COURTS.find(c => c.id === selectedEvent.courtId);
-                        if (court) {
-                          setSelectedEvent(null);
-                          handleCourtSelect(court);
-                        }
-                      }}
-                      className="flex-1 bg-slate-50 text-primary py-4 md:py-6 rounded-2xl md:rounded-[2rem] font-black hover:bg-slate-100 transition border border-slate-200 uppercase tracking-widest text-xs md:text-sm active:scale-95"
-                    >
-                      View Facility
-                    </button>
-                  </div>
-                </>
-              )}
-
-              {eventRegistrationStep === 'form' && (
-                <div className="space-y-6 md:space-y-8">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl md:text-3xl font-black text-primary tracking-tighter uppercase">Registration</h3>
-                    <button onClick={() => setEventRegistrationStep('details')} className="text-slate-400 hover:text-primary font-black uppercase text-[10px] md:text-xs tracking-widest transition-colors">Go Back</button>
-                  </div>
-                  <div className="bg-slate-50 p-5 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-slate-100 space-y-5 md:space-y-6">
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 md:mb-3 ml-2">Full Name</label>
-                      <input
-                        type="text"
-                        value={userName}
-                        onChange={(e) => setUserName(e.target.value)}
-                        className="w-full border border-slate-200 rounded-xl md:rounded-2xl px-4 md:px-5 py-3 md:py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium"
-                        placeholder="John Doe"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 md:mb-3 ml-2">Email Address</label>
-                      <input
-                        type="email"
-                        value={userEmail}
-                        onChange={(e) => setUserEmail(e.target.value)}
-                        className="w-full border border-slate-200 rounded-xl md:rounded-2xl px-4 md:px-5 py-3 md:py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium"
-                        placeholder="john@example.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 md:mb-3 ml-2">Mobile Number</label>
-                      <input
-                        type="tel"
-                        value={userPhone}
-                        onChange={(e) => setUserPhone(e.target.value)}
-                        className="w-full border border-slate-200 rounded-xl md:rounded-2xl px-4 md:px-5 py-3 md:py-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-slate-900 font-medium"
-                        placeholder="+63 900 000 0000"
-                      />
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (userName && userEmail && userPhone) {
-                        // Send event registration email
-                        emailjs.send(EMAILJS.serviceId, EMAILJS.templates.bookingAndRegistration, {
-                          type: 'NEW EVENT REGISTRATION',
-                          heading_label: 'EVENT',
-                          heading_value: selectedEvent?.title || '',
-                          detail_1_label: 'Type',
-                          detail_1_value: selectedEvent?.type || '',
-                          detail_2_label: 'Date',
-                          detail_2_value: selectedEvent?.date || '',
-                          detail_3_label: 'Location',
-                          detail_3_value: selectedEvent?.location || '',
-                          detail_4_label: '',
-                          detail_4_value: '',
-                          detail_5_label: '',
-                          detail_5_value: '',
-                          person_section_title: 'REGISTERED BY',
-                          user_name: userName,
-                          user_email: userEmail,
-                          user_phone: userPhone,
-                          name: userName,
-                          email: userEmail,
-                        }, EMAILJS.publicKey);
-                        setEventRegistrationStep('success');
-                      } else {
-                        alert('Please fill in all fields');
-                      }
-                    }}
-                    className="w-full bg-primary text-white py-4 md:py-6 rounded-2xl md:rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-xs md:text-sm active:scale-95"
-                  >
-                    Submit Registration
-                  </button>
-                </div>
-              )}
-
-              {eventRegistrationStep === 'success' && (
-                <div className="text-center space-y-6 md:space-y-8 py-4 md:py-8">
-                  <div className="w-24 h-24 md:w-32 md:h-32 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-primary text-4xl md:text-6xl shadow-inner border border-slate-50">
-                    <i className="fas fa-check-circle"></i>
-                  </div>
-                  <div className="space-y-3 md:space-y-4">
-                    <h2 className="text-3xl md:text-5xl font-black text-primary tracking-tighter uppercase">Registered!</h2>
-                    <p className="text-slate-500 text-sm md:text-lg font-medium max-w-sm mx-auto">You're all set for <span className="text-primary font-black">{selectedEvent.title}</span>.</p>
-                  </div>
-
-                  <div className="bg-slate-50 p-5 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-slate-100 text-left space-y-3 md:space-y-4 max-w-sm mx-auto">
-                    <h3 className="font-black uppercase text-[10px] md:text-xs tracking-widest text-primary mb-4 md:mb-6">Registration Receipt</h3>
-                    <div className="flex justify-between items-center border-b border-slate-200 pb-3 md:pb-4">
-                      <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">Name</span>
-                      <span className="text-xs md:text-sm font-black text-primary">{userName}</span>
-                    </div>
-                    <div className="flex justify-between items-center border-b border-slate-200 pb-3 md:pb-4">
-                      <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">Email</span>
-                      <span className="text-xs md:text-sm font-black text-primary truncate ml-4">{userEmail}</span>
-                    </div>
-                    <div className="flex justify-between items-center border-b border-slate-200 pb-3 md:pb-4">
-                      <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">Phone</span>
-                      <span className="text-xs md:text-sm font-black text-primary">{userPhone}</span>
-                    </div>
-                    <div className="flex justify-between items-center pt-2">
-                      <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">Fee</span>
-                      <span className="text-base md:text-lg font-black text-primary">{selectedEvent.registrationFee}</span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setSelectedEvent(null)}
-                    className="w-full max-w-sm mx-auto block bg-primary text-white py-4 md:py-6 rounded-2xl md:rounded-[2rem] font-black hover:bg-slate-800 transition shadow-2xl uppercase tracking-widest text-xs md:text-sm active:scale-95"
-                  >
-                    Close
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <header className={`fixed top-0 left-0 right-0 z-40 transition-transform duration-300 ${headerVisible ? 'translate-y-0' : '-translate-y-full'}`}>
@@ -1624,7 +1331,7 @@ const App: React.FC = () => {
                 <Logo />
               </div>
               <nav className="hidden md:flex gap-14">
-                {['home', 'community', 'about'].map(tab => (
+                {['home', 'about'].map(tab => (
                   <button
                     key={tab}
                     onClick={() => { setActiveTab(tab); setSelectedCourt(null); setBookingStep('details'); }}
@@ -1654,7 +1361,6 @@ const App: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-16 pb-20 md:pb-16">
         {activeTab === 'home' && renderHome()}
         {activeTab === 'booking' && renderBookingFlow()}
-        {activeTab === 'community' && renderCommunity()}
         {activeTab === 'about' && renderAbout()}
       </main>
 
@@ -1673,7 +1379,6 @@ const App: React.FC = () => {
              <h4 className="font-black text-[9px] md:text-xs uppercase tracking-[0.5em] text-white/50">Quick Links</h4>
              <ul className="flex md:block gap-6 md:space-y-6 text-sm md:text-lg font-black uppercase">
                 <li><button onClick={() => {setActiveTab('home'); setBookingStep('details'); scrollToBrowse();}} className="text-white/90 hover:text-white transition">Arenas</button></li>
-                <li><button onClick={() => setActiveTab('community')} className="text-white/90 hover:text-white transition">Events</button></li>
                 <li><button onClick={() => setActiveTab('about')} className="text-white/90 hover:text-white transition">About Us</button></li>
              </ul>
            </div>
@@ -1702,7 +1407,6 @@ const App: React.FC = () => {
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 flex md:hidden justify-around py-2 px-2">
         {[
           { tab: 'home', icon: 'fa-home', label: 'Home' },
-          { tab: 'community', icon: 'fa-users', label: 'Community' },
           { tab: 'about', icon: 'fa-info-circle', label: 'About' },
         ].map(item => (
           <button
@@ -1719,7 +1423,7 @@ const App: React.FC = () => {
   );
 };
 
-const CourtCard: React.FC<{court: Court, onBook: () => void}> = ({ court, onBook }) => {
+const CourtCard: React.FC<{court: Court, onBook: () => void, onQuickBook: () => void, availableToday: number}> = ({ court, onBook, onQuickBook, availableToday }) => {
   return (
     <div className="bg-white rounded-2xl md:rounded-[3rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 group border border-slate-100 flex flex-col h-full active:scale-[0.98]">
       <div className="relative h-52 md:h-64 overflow-hidden shrink-0">
@@ -1732,6 +1436,11 @@ const CourtCard: React.FC<{court: Court, onBook: () => void}> = ({ court, onBook
               {court.numberOfCourts} Courts
             </span>
           )}
+        </div>
+        <div className="absolute bottom-3 right-3">
+          <span className={`px-2.5 py-1 rounded-lg text-[8px] md:text-[9px] font-black uppercase tracking-wider shadow-lg ${availableToday > 0 ? 'bg-emerald-500 text-white' : 'bg-slate-800/80 text-white/70'}`}>
+            {availableToday > 0 ? `${availableToday} open today` : 'Full today'}
+          </span>
         </div>
       </div>
       <div className="p-6 sm:p-8 space-y-4 flex-1 flex flex-col bg-white">
@@ -1749,12 +1458,20 @@ const CourtCard: React.FC<{court: Court, onBook: () => void}> = ({ court, onBook
           <div className="shrink-0">
             <p className="text-3xl md:text-4xl font-black text-primary tracking-tighter">₱{court.price}<span className="text-[10px] text-slate-300 font-black ml-1 uppercase tracking-widest">/hr</span></p>
           </div>
-          <button
-            onClick={onBook}
-            className="bg-primary text-white px-6 md:px-8 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black hover:bg-primary-dark transition-all duration-500 shadow-xl shadow-primary/20 active:scale-90 text-[10px] md:text-xs uppercase tracking-widest shrink-0"
-          >
-            BOOK SLOT
-          </button>
+          <div className="flex gap-2 shrink-0">
+            <button
+              onClick={onBook}
+              className="border border-slate-200 text-primary px-4 md:px-5 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black hover:bg-slate-50 transition-all duration-300 text-[10px] md:text-xs uppercase tracking-widest"
+            >
+              Details
+            </button>
+            <button
+              onClick={onQuickBook}
+              className="bg-primary text-white px-5 md:px-7 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black hover:bg-primary-dark transition-all duration-500 shadow-xl shadow-primary/20 active:scale-90 text-[10px] md:text-xs uppercase tracking-widest"
+            >
+              Book
+            </button>
+          </div>
         </div>
       </div>
     </div>
