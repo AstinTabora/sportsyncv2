@@ -49,9 +49,6 @@ const App: React.FC = () => {
   const [bookingStep, setBookingStep] = useState<'details' | 'calendar' | 'payment' | 'success' | 'confirmation'>('details');
   const [detailSubTab, setDetailSubTab] = useState<'map' | 'photos' | 'pricing' | 'availability'>('map');
   
-  // Google Calendar Auth State
-  const [isGoogleAuthenticated, setIsGoogleAuthenticated] = useState(false);
-  const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -74,17 +71,6 @@ const App: React.FC = () => {
   const [headerVisible, setHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
 
-  const scrollAndBounce = (ref: React.RefObject<HTMLElement | null>, selector?: string) => {
-    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setTimeout(() => {
-      const target = selector ? ref.current?.querySelector(selector) : ref.current;
-      if (target) {
-        target.classList.add('animate-subtle-bounce');
-        setTimeout(() => target.classList.remove('animate-subtle-bounce'), 800);
-      }
-    }, 600);
-  };
-
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY;
@@ -100,7 +86,6 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    checkAuthStatus();
     const saved = localStorage.getItem('sportsync_user');
     if (saved) {
       try {
@@ -111,60 +96,6 @@ const App: React.FC = () => {
       } catch {}
     }
   }, []);
-
-  const checkAuthStatus = async () => {
-    try {
-      const response = await fetch('/api/auth/status');
-      const data = await response.json();
-      setIsGoogleAuthenticated(data.isAuthenticated);
-      if (data.isAuthenticated) {
-        fetchCalendarEvents();
-      }
-    } catch (error) {
-      console.error("Error checking auth status:", error);
-    }
-  };
-
-  const fetchCalendarEvents = async () => {
-    try {
-      const response = await fetch('/api/calendar/events');
-      if (response.ok) {
-        const data = await response.json();
-        setCalendarEvents(data.items || []);
-      }
-    } catch (error) {
-      console.error("Error fetching calendar events:", error);
-    }
-  };
-
-  const handleGoogleConnect = async () => {
-    try {
-      const response = await fetch('/api/auth/url');
-      const { url } = await response.json();
-      const authWindow = window.open(url, 'google_auth_popup', 'width=600,height=700');
-      
-      const handleMessage = (event: MessageEvent) => {
-        if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
-          setIsGoogleAuthenticated(true);
-          fetchCalendarEvents();
-          window.removeEventListener('message', handleMessage);
-        }
-      };
-      window.addEventListener('message', handleMessage);
-    } catch (error) {
-      console.error("Error connecting to Google:", error);
-    }
-  };
-
-  const handleGoogleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      setIsGoogleAuthenticated(false);
-      setCalendarEvents([]);
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
 
   const filteredCourts = COURTS.filter(c =>
     (filter === 'All' || c.type === filter) &&
